@@ -115,7 +115,6 @@
             background: #ff0000; 
             box-shadow: 0 0 15px #ff0000;
         }
-        /* Estilos para el modal de exportación */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(10,11,30,0.95); z-index: 9999;
@@ -155,7 +154,7 @@
     <!-- PANEL DE NOTAS (PROFESOR) -->
     <div id="dashboard-view" class="container hidden">
         <div class="q-card" style="border-color: #9d00ff;">
-            <h2 style="color: #9d00ff; text-align: center;">BASE DE DATOS CENTRAL (GitHub)</h2>
+            <h2 style="color: #9d00ff; text-align: center;">BASE DE DATOS (Google Sheets)</h2>
             <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
                 <button class="btn-delete" onclick="borrarTodosLosRegistros()" style="padding: 10px 20px;">🗑️ BORRAR TODOS LOS REGISTROS</button>
             </div>
@@ -210,23 +209,18 @@
 
     <script>
         // ==========================================
-        // CONFIGURACIÓN DE GITHUB
+        // CONFIGURACIÓN DE GOOGLE SHEETS
         // ==========================================
-        const GITHUB_TOKEN = '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';
-        const GITHUB_USERNAME = 'matabryan267-ALT';
-        const GITHUB_REPO = 'duopractica';
-        const GITHUB_FILE_PATH = 'resultados.json';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwl7DchJSUb6NZLmFwVbhvXslZgPWFC8N_ekI9ZQD69Khil6gCP778k0dl47ZBUP5ODA/exec';
 
         // ==========================================
-        // FUNCIONES DE CODIFICACIÓN SEGURA (Compatibilidad móvil)
+        // FUNCIONES DE CODIFICACIÓN SEGURA
         // ==========================================
         function encodeBase64(str) {
             const encoder = new TextEncoder();
             const data = encoder.encode(str);
             let binary = '';
-            for (let i = 0; i < data.length; i++) {
-                binary += String.fromCharCode(data[i]);
-            }
+            for (let i = 0; i < data.length; i++) binary += String.fromCharCode(data[i]);
             return btoa(binary);
         }
 
@@ -234,13 +228,9 @@
             try {
                 const binary = atob(base64);
                 const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) {
-                    bytes[i] = binary.charCodeAt(i);
-                }
-                const decoder = new TextDecoder();
-                return decoder.decode(bytes);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                return new TextDecoder().decode(bytes);
             } catch (e) {
-                // Fallback para enlaces antiguos
                 return decodeURIComponent(escape(atob(base64)));
             }
         }
@@ -251,17 +241,15 @@
         let quizData = [];
         let currentIndex = 0;
         let selectedIdx = null;
-        let timerInterval;
+        let timerInterval, autoNextTimer = null;
         let timeLeft;
-        let autoNextTimer = null;
-        
         let studentProfile = { name: '', id: '' };
-        let studentScore = 0; 
+        let studentScore = 0;
         let esProfesor = true;
         let quizCompletado = false;
 
         // ==========================================
-        // FUNCIONES DEL EDITOR (PROFESOR)
+        // FUNCIONES DEL EDITOR
         // ==========================================
         function addQuestion() {
             const id = Date.now();
@@ -269,7 +257,7 @@
                 <div class="q-card" id="q-${id}">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <strong style="color: var(--neon-blue)"># Módulo de Pregunta</strong>
-                        <button onclick="document.getElementById('q-${id}').remove()" style="background:none; color:var(--neon-pink); padding:0; font-size: 12px; font-family:sans-serif;">[ ELIMINAR ]</button>
+                        <button onclick="document.getElementById('q-${id}').remove()" style="background:none; color:var(--neon-pink); padding:0; font-size:12px;">[ ELIMINAR ]</button>
                     </div>
                     <input type="text" class="q-text" placeholder="Escribe el desafío aquí...">
                     <input type="text" class="q-img" placeholder="URL de imagen (opcional)">
@@ -283,7 +271,7 @@
                             <input type="text" class="opt-text" placeholder="Opción de Distracción">
                         </div>
                     </div>
-                    <button class="btn-blue" onclick="addOptionToQuestion('${id}')" style="margin-top:15px; font-size:11px; padding: 8px 15px;">+ Añadir Opción</button>
+                    <button class="btn-blue" onclick="addOptionToQuestion('${id}')" style="margin-top:15px; font-size:11px; padding:8px 15px;">+ Añadir Opción</button>
                 </div>
             `;
             document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
@@ -295,13 +283,12 @@
                 <div class="option-edit-row">
                     <input type="radio" name="correct-${qId}" class="is-correct-check">
                     <input type="text" class="opt-text" placeholder="Opción adicional">
-                    <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size: 20px;">×</button>
+                    <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', html);
         }
 
-        // NUEVA FUNCIÓN DE EXPORTACIÓN CON MODAL Y ADVERTENCIA
         function exportQuiz() {
             const cards = document.querySelectorAll('#questions-container .q-card');
             const data = Array.from(cards).map(card => {
@@ -310,228 +297,123 @@
                     text: row.querySelector('.opt-text').value,
                     correct: row.querySelector('.is-correct-check').checked
                 })).filter(o => o.text.trim() !== "");
-                return {
-                    q: card.querySelector('.q-text').value,
-                    img: card.querySelector('.q-img').value,
-                    options: options
-                };
+                return { q: card.querySelector('.q-text').value, img: card.querySelector('.q-img').value, options };
             }).filter(q => q.q.trim() !== "" && q.options.length > 0);
 
-            if (data.length === 0) return alert("❌ Error: No hay datos suficientes para generar el protocolo.");
-            
-            const config = { 
-                time: document.getElementById('global-timer').value || 20, 
-                questions: data 
-            };
-            
+            if (data.length === 0) return alert("❌ Error: No hay datos suficientes.");
+            const config = { time: document.getElementById('global-timer').value || 20, questions: data };
             const jsonString = JSON.stringify(config);
             const encoded = encodeBase64(jsonString);
-            const urlParams = '?quiz=' + encodeURIComponent(encoded);
-            const url = window.location.origin + window.location.pathname + urlParams;
+            const url = window.location.origin + window.location.pathname + '?quiz=' + encodeURIComponent(encoded);
             
-            // Advertencia si es local
             if (window.location.protocol === 'file:') {
-                alert('⚠️ ADVERTENCIA: Estás ejecutando desde un archivo local.\n\n' +
-                      'Para que el enlace funcione en WhatsApp debes:\n' +
-                      '1. Subir este archivo HTML a un servidor web (GitHub Pages, Netlify, etc.)\n' +
-                      '2. Usar el enlace HTTPS generado desde allí.\n\n' +
-                      'El enlace local NO será clickeable en WhatsApp.');
+                alert('⚠️ ADVERTENCIA: Archivo local. Sube este HTML a un servidor para WhatsApp.');
             }
             
-            // Crear modal
             const modalHTML = `
                 <div id="url-modal" class="modal-overlay">
                     <div class="modal-content">
-                        <h3 style="color:var(--neon-green); margin-top:0;">🔗 Enlace del Protocolo Generado</h3>
-                        <p style="margin-bottom:10px;">Copia este enlace y compártelo por WhatsApp:</p>
+                        <h3 style="color:var(--neon-green); margin-top:0;">🔗 Enlace del Protocolo</h3>
+                        <p>Copia y comparte por WhatsApp:</p>
                         <div style="background:#0a0b1e; border:1px solid var(--neon-blue); border-radius:12px; padding:15px; word-break:break-all; font-family:monospace; margin-bottom:20px;" id="url-text">${url}</div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="btn-green" style="flex:2;" onclick="window.copiarEnlaceModal()">📋 Copiar al portapapeles</button>
+                            <button class="btn-green" style="flex:2;" onclick="window.copiarEnlaceModal()">📋 Copiar</button>
                             <button class="btn-blue" style="flex:1;" onclick="window.open('${url}', '_blank')">🚀 Probar</button>
                             <button class="btn-red" style="flex:1;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
                         </div>
-                        <p style="font-size:12px; margin-top:15px; color:#aaa;">Asegúrate de que el enlace comience con https:// para que WhatsApp lo detecte.</p>
                     </div>
                 </div>
             `;
-            
-            const oldModal = document.getElementById('url-modal');
-            if (oldModal) oldModal.remove();
+            const oldModal = document.getElementById('url-modal'); if (oldModal) oldModal.remove();
             document.body.insertAdjacentHTML('beforeend', modalHTML);
-            
-            window.copiarEnlaceModal = function() {
+            window.copiarEnlaceModal = () => {
                 const urlText = document.getElementById('url-text').innerText;
-                navigator.clipboard.writeText(urlText).then(() => {
-                    alert('✅ ¡Enlace copiado! Ya puedes pegarlo en WhatsApp.');
-                }).catch(() => {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = urlText;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    alert('✅ Enlace copiado (método alternativo).');
+                navigator.clipboard.writeText(urlText).then(() => alert('✅ Enlace copiado')).catch(() => {
+                    const ta = document.createElement('textarea'); ta.value = urlText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('✅ Copiado (alternativo)');
                 });
             };
         }
 
         // ==========================================
-        // FUNCIONES GITHUB (guardar, borrar, cargar)
+        // FUNCIONES GOOGLE SHEETS
         // ==========================================
         async function guardarPuntaje(nombre, cedula, puntos, totalPreguntas) {
-            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
+            const url = `${SCRIPT_URL}?action=guardar&nombre=${encodeURIComponent(nombre)}&cedula=${encodeURIComponent(cedula)}&nota=${puntos}&total=${totalPreguntas}`;
             try {
-                const getResponse = await fetch(apiUrl, {
-                    headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
-                if (!getResponse.ok) {
-                    if (getResponse.status === 404) {
-                        const nuevoRegistro = [{
-                            nombre, cedula, nota: puntos, total_preguntas: totalPreguntas,
-                            fecha: new Date().toISOString()
-                        }];
-                        const contenidoBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(nuevoRegistro, null, 2))));
-                        const putResponse = await fetch(apiUrl, {
-                            method: 'PUT',
-                            headers: {
-                                'Authorization': `token ${GITHUB_TOKEN}`,
-                                'Accept': 'application/vnd.github.v3+json',
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ message: `Crear resultados.json con ${nombre}`, content: contenidoBase64 })
-                        });
-                        if (!putResponse.ok) throw new Error('Error al crear archivo nuevo');
-                        return true;
-                    }
-                    throw new Error(`Error GET: ${getResponse.status}`);
-                }
-                const fileData = await getResponse.json();
-                const sha = fileData.sha;
-                const contenidoStr = atob(fileData.content);
-                let resultados = JSON.parse(contenidoStr);
-                if (!Array.isArray(resultados)) resultados = [];
-                resultados.push({
-                    nombre, cedula, nota: puntos, total_preguntas: totalPreguntas,
-                    fecha: new Date().toISOString()
-                });
-                const nuevoContenidoBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(resultados, null, 2))));
-                const putResponse = await fetch(apiUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ message: `➕ Agregar resultado de ${nombre}`, content: nuevoContenidoBase64, sha })
-                });
-                if (!putResponse.ok) throw new Error('Error PUT');
+                const response = await fetch(url);
+                const text = await response.text();
+                if (text.trim() !== 'OK') throw new Error('Error del servidor: ' + text);
                 return true;
+            } catch (error) {
+                console.error(error);
+                alert('❌ Error al guardar en Google Sheets:\n' + error.message);
+                throw error;
+            }
+        }
+
+        async function obtenerRegistros() {
+            const url = `${SCRIPT_URL}?action=obtener`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                return data; // array de arrays: [nombre, cedula, nota, total, fecha]
             } catch (error) {
                 console.error(error);
                 throw error;
             }
         }
 
-        async function borrarRegistroPorCedula(cedula) {
-            if (!confirm(`¿Estás seguro de eliminar el registro con cédula ${cedula}?`)) return;
-            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
+        async function borrarTodosLosRegistros() {
+            if (!confirm('⚠️ ¿Eliminar TODOS los registros de la hoja de cálculo?')) return;
+            const url = `${SCRIPT_URL}?action=borrar`;
             try {
-                const getResponse = await fetch(apiUrl, { headers: { 'Authorization': `token ${GITHUB_TOKEN}` } });
-                if (!getResponse.ok) throw new Error('Error al obtener archivo');
-                const fileData = await getResponse.json();
-                const sha = fileData.sha;
-                const contenidoStr = atob(fileData.content);
-                let resultados = JSON.parse(contenidoStr);
-                const resultadosFiltrados = resultados.filter(r => r.cedula !== cedula);
-                const nuevoContenidoBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(resultadosFiltrados, null, 2))));
-                const putResponse = await fetch(apiUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ message: `🗑️ Eliminar registro cédula ${cedula}`, content: nuevoContenidoBase64, sha })
-                });
-                if (!putResponse.ok) throw new Error('Error al actualizar');
-                alert('✅ Registro eliminado');
-                abrirPanelNotas();
+                const response = await fetch(url);
+                const text = await response.text();
+                if (text.trim() === 'OK') {
+                    alert('✅ Todos los registros eliminados');
+                    abrirPanelNotas();
+                } else {
+                    throw new Error('Respuesta inesperada');
+                }
             } catch (error) {
-                alert('❌ Error al eliminar');
+                alert('❌ Error: ' + error.message);
             }
         }
 
-        async function borrarTodosLosRegistros() {
-            if (!confirm('⚠️ ¿Eliminar TODOS los registros?')) return;
-            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
-            try {
-                const getResponse = await fetch(apiUrl, { headers: { 'Authorization': `token ${GITHUB_TOKEN}` } });
-                if (!getResponse.ok) {
-                    if (getResponse.status === 404) { alert('No hay registros'); return; }
-                    throw new Error('Error al obtener archivo');
-                }
-                const fileData = await getResponse.json();
-                const sha = fileData.sha;
-                const contenidoVacio = [];
-                const nuevoContenidoBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(contenidoVacio, null, 2))));
-                const putResponse = await fetch(apiUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ message: `🗑️🗑️🗑️ ELIMINAR TODOS LOS REGISTROS`, content: nuevoContenidoBase64, sha })
-                });
-                if (!putResponse.ok) throw new Error('Error al actualizar');
-                alert('✅ Todos los registros eliminados');
-                abrirPanelNotas();
-            } catch (error) {
-                alert('❌ Error al eliminar');
-            }
+        function borrarRegistroPorCedula(cedula) {
+            alert('Para eliminar un registro individual, ábrelo directamente en tu hoja de Google Sheets.');
         }
 
         async function abrirPanelNotas() {
             if (!esProfesor || quizCompletado) {
-                alert('⛔ Acceso denegado. Los alumnos no pueden acceder al panel de notas.');
+                alert('⛔ Acceso denegado.');
                 return;
             }
             document.getElementById('editor-view').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
             const tbody = document.getElementById('notas-body');
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Cargando registros desde GitHub...</td></tr>`;
-            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Cargando registros desde Google Sheets...</td></tr>`;
             try {
-                const response = await fetch(apiUrl, { headers: { 'Authorization': `token ${GITHUB_TOKEN}` } });
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Aún no hay alumnos evaluados.</td></tr>`;
-                    } else {
-                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--neon-pink);">Error al cargar: ${response.status}</td></tr>`;
-                    }
-                    return;
-                }
-                const fileData = await response.json();
-                const contenidoStr = atob(fileData.content);
-                const resultados = JSON.parse(contenidoStr);
-                if (!Array.isArray(resultados) || resultados.length === 0) {
+                const registros = await obtenerRegistros();
+                if (!registros || registros.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Aún no hay registros.</td></tr>`;
                     return;
                 }
-                resultados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                // Ordenar por fecha descendente (índice 4)
+                registros.sort((a, b) => new Date(b[4]) - new Date(a[4]));
                 tbody.innerHTML = '';
-                resultados.forEach(fila => {
+                registros.forEach(fila => {
                     tbody.innerHTML += `
                         <tr>
-                            <td>${fila.nombre || ''}</td>
-                            <td>${fila.cedula || ''}</td>
-                            <td><strong style="color:var(--neon-green)">${fila.nota || 0} / ${fila.total_preguntas || '?'}</strong></td>
-                            <td><button class="btn-delete" onclick="borrarRegistroPorCedula('${fila.cedula}')" style="padding: 5px 10px;">🗑️ Eliminar</button></td>
+                            <td>${fila[0] || ''}</td>
+                            <td>${fila[1] || ''}</td>
+                            <td><strong style="color:var(--neon-green)">${fila[2] || 0} / ${fila[3] || '?'}</strong></td>
+                            <td><button class="btn-delete" onclick="borrarRegistroPorCedula('${fila[1]}')">🗑️</button></td>
                         </tr>
                     `;
                 });
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--neon-pink);">Error de conexión</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" style="color:var(--neon-pink);">Error de conexión</td></tr>`;
             }
         }
 
@@ -557,7 +439,7 @@
                     document.getElementById('editor-view').classList.add('hidden');
                     document.getElementById('login-view').classList.remove('hidden');
                 } catch(e) {
-                    alert("Error al cargar el quiz. El enlace puede estar dañado o ser incompatible.");
+                    alert("Error al cargar el quiz.");
                     location.href = location.pathname;
                 }
             } else {
@@ -571,7 +453,7 @@
             const nombre = document.getElementById('student-name').value.trim();
             const cedula = document.getElementById('student-id').value.trim();
             if(nombre === "" || cedula === "") {
-                alert("Por favor, completa tus datos.");
+                alert("Completa tus datos.");
                 return;
             }
             studentProfile.name = nombre;
@@ -686,7 +568,7 @@
         async function finalizarYCargarNotas() {
             const total = quizData.length;
             quizCompletado = true;
-            document.getElementById('game-content').innerHTML = `<div style="text-align:center;"><h2 style="color:var(--neon-blue);">ENVIANDO RESULTADOS A GITHUB...</h2></div>`;
+            document.getElementById('game-content').innerHTML = `<div style="text-align:center;"><h2 style="color:var(--neon-blue);">ENVIANDO RESULTADOS A GOOGLE SHEETS...</h2></div>`;
             document.getElementById('main-check-btn').classList.add('hidden');
             document.getElementById('timer-fill').parentElement.classList.add('hidden');
             let exito = false, errorMsg = '';
@@ -701,7 +583,7 @@
                     <p style="font-size: 20px;">Estudiante: <span style="color:var(--neon-blue)">${studentProfile.name}</span></p>
                     <p style="font-size: 24px; font-weight: 700;">Nota: ${studentScore} / ${total}</p>
                     <div style="padding: 10px; margin: 20px auto; max-width: 300px; border: 1px solid ${exito ? 'var(--neon-green)' : 'var(--neon-pink)'}; border-radius: 10px;">
-                        ${exito ? '✅ Datos guardados en GitHub' : '❌ Error: ' + errorMsg}
+                        ${exito ? '✅ Datos guardados en Google Sheets' : '❌ Error: ' + errorMsg}
                     </div>
                     <div style="margin-top: 30px; padding: 20px; background: #0f1225; border-radius: 15px; border: 1px solid var(--neon-blue);">
                         <h3 style="color: var(--neon-blue); margin: 0 0 10px;">🔒 Sesión finalizada</h3>
