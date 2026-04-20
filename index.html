@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>DuoQuiz Pro - Neon Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ===== ESTILOS (SIN CAMBIOS) ===== */
+        :root {
+            --neon-green: #39ff14;
+            --neon-green-dark: #28cc0d;
+            --neon-blue: #00f3ff;
+            --neon-blue-dark: #00b8c4;
+            --neon-pink: #ff00e0;
+            --neon-pink-dark: #c400ad;
+            --bg-dark: #0a0b1e;
+            --card-bg: #161b33;
+            --text-light: #e0e0ff;
+        }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 50%, #1a1f4d 0%, #0a0b1e 100%);
+        }
+        .header {
+            width: 100%;
+            background: rgba(22, 27, 51, 0.9);
+            padding: 20px 0;
+            border-bottom: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue-dark);
+            text-align: center;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        h1, h2, h3, .logo { font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
+        .logo { margin:0; color: var(--neon-green); font-size: 28px; text-shadow: 0 0 10px var(--neon-green-dark); }
+        .container { width: 90%; max-width: 700px; padding-bottom: 150px; }
+        .hidden { display: none !important; }
+        button {
+            cursor: pointer; border: none; border-radius: 12px; font-weight: 800;
+            font-family: 'Orbitron', sans-serif; text-transform: uppercase;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 14px; padding: 14px 24px;
+        }
+        button:active { transform: scale(0.95); }
+        .btn-green { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green-dark); }
+        .btn-green:hover { box-shadow: 0 0 25px var(--neon-green); }
+        .btn-blue { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue-dark); }
+        .btn-blue:hover { box-shadow: 0 0 25px var(--neon-blue); }
+        .btn-red { background: var(--neon-pink); color: #fff; box-shadow: 0 0 15px var(--neon-pink-dark); }
+        .btn-purple { background: #9d00ff; color: #fff; box-shadow: 0 0 15px #6a00a8; }
+        .btn-purple:hover { box-shadow: 0 0 25px #9d00ff; }
+        .q-card {
+            background: var(--card-bg); border: 2px solid #2d345e; border-radius: 20px;
+            padding: 25px; margin-bottom: 25px; animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        input {
+            width: 100%; padding: 14px; margin: 10px 0; background: #0f1225;
+            border: 2px solid #2d345e; border-radius: 14px; font-family: inherit;
+            color: white; box-sizing: border-box; font-size: 16px; transition: 0.3s;
+        }
+        input:focus { border-color: var(--neon-blue); outline: none; box-shadow: 0 0 10px var(--neon-blue-dark); }
+        .option-edit-row { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+        .is-correct-check { width: 30px !important; height: 30px; cursor: pointer; accent-color: var(--neon-green); }
+        .progress-container { width: 100%; height: 14px; background: #1a1f4d; border-radius: 20px; margin: 25px 0; overflow: hidden; border: 1px solid var(--neon-blue-dark); }
+        #timer-fill { height: 100%; background: var(--neon-blue); width: 100%; box-shadow: 0 0 15px var(--neon-blue); transition: width 1s linear; }
+        .quiz-img { max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 18px; margin-bottom: 20px; background: #000; border: 2px solid var(--neon-blue); box-shadow: 0 0 15px rgba(0, 243, 255, 0.3); }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .opt-btn {
+            border: 2px solid #2d345e; background: var(--card-bg); color: var(--text-light);
+            border-radius: 18px; padding: 22px; font-size: 18px; text-align: center;
+            font-weight: 700; transition: all 0.2s; cursor: pointer;
+        }
+        .opt-btn:hover { border-color: var(--neon-blue); background: #1e2548; }
+        .opt-btn.selected {
+            border-color: var(--neon-blue); background: #00f3ff22; color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), inset 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+        .feedback-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; padding: 35px; transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            display: flex; justify-content: center; z-index: 2000; backdrop-filter: blur(15px);
+        }
+        .feedback-bar.show { transform: translateY(0); }
+        .correct-bg { background-color: rgba(57, 255, 20, 0.15); border-top: 3px solid var(--neon-green); }
+        .wrong-bg { background-color: rgba(255, 0, 224, 0.15); border-top: 3px solid var(--neon-pink); }
+        .feedback-content { width: 100%; max-width: 700px; display: flex; justify-content: space-between; align-items: center; }
+        .feedback-text h2 { margin: 0; font-size: 26px; font-family: 'Orbitron'; }
+        .feedback-text p { margin: 8px 0 0; font-weight: 700; color: #fff; }
+        .notas-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0f1225; border-radius: 10px; overflow: hidden; }
+        .notas-table th, .notas-table td { padding: 15px; border-bottom: 1px solid #2d345e; text-align: left; }
+        .notas-table th { background: #1a1f4d; color: var(--neon-blue); font-family: 'Orbitron'; }
+        .notas-table tr:hover { background: #161b33; }
+        .btn-delete { 
+            background: #ff3333; 
+            color: white; 
+            padding: 5px 12px; 
+            font-size: 12px; 
+            border-radius: 8px;
+            box-shadow: 0 0 8px #ff0000;
+        }
+        .btn-delete:hover { 
+            background: #ff0000; 
+            box-shadow: 0 0 15px #ff0000;
+        }
+        /* Estilos para el modal de exportación */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10,11,30,0.95); z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: #161b33; border: 2px solid var(--neon-blue);
+            border-radius: 20px; padding: 30px; max-width: 600px; width: 90%;
+            box-shadow: 0 0 40px var(--neon-blue-dark);
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } .feedback-content { flex-direction: column; text-align: center; gap: 15px; } }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">DuoQuiz <span style="color: var(--neon-blue)">PRO</span></div>
+    </div>
+
+    <!-- VISTA EDITOR (PROFESOR) -->
+    <div id="editor-view" class="container">
+        <button class="btn-purple" style="width: 100%; margin-bottom: 25px; padding: 18px; font-size: 16px;" onclick="abrirPanelNotas()">📊 VER NOTAS DE ALUMNOS</button>
+        <div class="q-card" style="border-color: var(--neon-blue);">
+            <h3 style="margin-top:0; color: var(--neon-blue)">⚡ Ajustes de Sistema</h3>
+            <label style="font-weight: 700;">Segundos por pulso:</label>
+            <input type="number" id="global-timer" value="20">
+        </div>
+        <div id="questions-container"></div>
+        <div style="display: flex; gap: 15px; margin-top: 25px;">
+            <button class="btn-blue" onclick="addQuestion()">+ Nueva Pregunta</button>
+            <button class="btn-green" style="flex-grow: 1;" onclick="exportQuiz()">🚀 Desplegar Protocolo</button>
+        </div>
+    </div>
+
+    <!-- PANEL DE NOTAS (PROFESOR) -->
+    <div id="dashboard-view" class="container hidden">
+        <div class="q-card" style="border-color: #9d00ff;">
+            <h2 style="color: #9d00ff; text-align: center;">BASE DE DATOS CENTRAL (GitHub)</h2>
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+                <button class="btn-delete" onclick="borrarTodosLosRegistros()" style="padding: 10px 20px;">🗑️ BORRAR TODOS LOS REGISTROS</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="notas-table" id="tabla-resultados">
+                    <thead>
+                        <tr><th>Nombre</th><th>Cédula</th><th>Puntuación</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="notas-body">
+                        <tr><td colspan="4" style="text-align: center;">Cargando registros...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn-blue" style="width: 100%; margin-top: 20px;" onclick="cerrarPanelNotas()">Volver al Editor</button>
+        </div>
+    </div>
+
+    <!-- LOGIN DEL ALUMNO -->
+    <div id="login-view" class="container hidden">
+        <div class="q-card" style="border-color: var(--neon-pink); text-align: center;">
+            <h2 style="color: var(--neon-pink)">IDENTIFICACIÓN REQUERIDA</h2>
+            <p>Ingresa tus credenciales para iniciar el protocolo.</p>
+            <input type="text" id="student-name" placeholder="Tu Nombre y Apellido" required>
+            <input type="number" id="student-id" placeholder="Cédula de Identidad" required>
+            <button class="btn-green" style="width: 100%; margin-top: 15px;" onclick="iniciarProtocoloAlumno()">Acceder al Sistema</button>
+        </div>
+    </div>
+
+    <!-- QUIZ DEL ALUMNO -->
+    <div id="quiz-view" class="container hidden">
+        <div class="progress-container"><div id="timer-fill"></div></div>
+        <div id="game-content" style="text-align: center;">
+            <img id="display-img" class="quiz-img hidden" src="" alt="imagen pregunta">
+            <h1 id="display-q" style="font-size: 28px; margin-bottom: 30px; text-shadow: 0 0 8px rgba(255,255,255,0.2);"></h1>
+            <div id="display-options" class="options-grid"></div>
+        </div>
+        <div style="text-align: center; margin-top: 50px;">
+            <button id="main-check-btn" class="btn-green" style="width: 80%; padding: 22px; font-size: 18px;" onclick="validateSelection()">Validar Respuesta</button>
+        </div>
+    </div>
+
+    <!-- BARRA DE FEEDBACK -->
+    <div id="feedback-bar" class="feedback-bar">
+        <div class="feedback-content">
+            <div class="feedback-text">
+                <h2 id="fb-title"></h2>
+                <p id="fb-sub"></p>
+            </div>
+            <button id="fb-btn" onclick="nextQuestion()" style="padding: 15px 40px; font-size: 16px;"></button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURACIÓN DE GITHUB
+        // ==========================================
+        const GITHUB_TOKEN = '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';
+        const GITHUB_USERNAME = 'matabryan267-ALT';
+        const GITHUB_REPO = 'duopractica';
+        const GITHUB_FILE_PATH = 'resultados.json';
+
+        // ==========================================
+        // FUNCIONES DE CODIFICACIÓN SEGURA (Compatibilidad móvil)
+        // ==========================================
+        function encodeBase64(str) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(str);
+            let binary = '';
+            for (let i = 0; i < data.length; i++) {
+                binary += String.fromCharCode(data[i]);
+            }
+            return btoa(binary);
+        }
+
+        function decodeBase64(base64) {
+            try {
+                const binary = atob(base64);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                const decoder = new TextDecoder();
+                return decoder.decode(bytes);
+            } catch (e) {
+                // Fallback para enlaces antiguos
+                return decodeURIComponent(escape(atob(base64)));
+            }
+        }
+
+        // ==========================================
+        // VARIABLES GLOBALES
+        // ==========================================
+        let quizData = [];
+        let currentIndex = 0;
+        let selectedIdx = null;
+        let timerInterval;
+        let timeLeft;
+        let autoNextTimer = null;
+        
+        let studentProfile = { name: '', id: '' };
+        let studentScore = 0; 
+        let esProfesor = true;
+        let quizCompletado = false;
+
+        // ==========================================
+        // FUNCIONES DEL EDITOR (PROFESOR)
+        // ==========================================
+        function addQuestion() {
+            const id = Date.now();
+            const html = `
+                <div class="q-card" id="q-${id}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <strong style="color: var(--neon-blue)"># Módulo de Pregunta</strong>
+                        <button onclick="document.getElementById('q-${id}').remove()" style="background:none; color:var(--neon-pink); padding:0; font-size: 12px; font-family:sans-serif;">[ ELIMINAR ]</button>
+                    </div>
+                    <input type="text" class="q-text" placeholder="Escribe el desafío aquí...">
+                    <input type="text" class="q-img" placeholder="URL de imagen (opcional)">
+                    <div class="options-area">
+                        <div class="option-edit-row">
+                            <input type="radio" name="correct-${id}" class="is-correct-check" checked>
+                            <input type="text" class="opt-text" placeholder="Opción Correcta">
+                        </div>
+                        <div class="option-edit-row">
+                            <input type="radio" name="correct-${id}" class="is-correct-check">
+                            <input type="text" class="opt-text" placeholder="Opción de Distracción">
+                        </div>
+                    </div>
+                    <button class="btn-blue" onclick="addOptionToQuestion('${id}')" style="margin-top:15px; font-size:11px; padding: 8px 15px;">+ Añadir Opción</button>
+                </div>
+            `;
+            document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
+        }
+
+        function addOptionToQuestion(qId) {
+            const container = document.querySelector(`#q-${qId} .options-area`);
+            const html = `
+                <div class="option-edit-row">
+                    <input type="radio" name="correct-${qId}" class="is-correct-check">
+                    <input type="text" class="opt-text" placeholder="Opción adicional">
+                    <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size: 20px;">×</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        // NUEVA FUNCIÓN DE EXPORTACIÓN CON MODAL Y ADVERTENCIA
+        function exportQuiz() {
+            const cards = document.querySelectorAll('#questions-container .q-card');
+            const data = Array.from(cards).map(card => {
+                const optionsRows = card.querySelectorAll('.option-edit-row');
+                const options = Array.from(optionsRows).map(row => ({
+                    text: row.querySelector('.opt-text').value,
+                    correct: row.querySelector('.is-correct-check').checked
+                })).filter(o => o.text.trim() !== "");
+                return {
+                    q: card.querySelector('.q-text').value,
+                    img: card.querySelector('.q-img').value,
+                    options: options
+                };
+            }).filter(q => q.q.trim() !== "" && q.options.length > 0);
+
+            if (data.length === 0) return alert("❌ Error: No hay datos suficientes para generar el protocolo.");
+            
+            const config = { 
+                time: document.getElementById('global-timer').value || 20, 
+                questions: data 
+            };
+            
+            const jsonString = JSON.stringify(config);
+            const encoded = encodeBase64(jsonString);
+            const urlParams = '?quiz=' + encodeURIComponent(encoded);
+            const url = window.location.origin + window.location.pathname + urlParams;
+            
+            // Advertencia si es local
+            if (window.location.protocol === 'file:') {
+                alert('⚠️ ADVERTENCIA: Estás ejecutando desde un archivo local.\n\n' +
+                      'Para que el enlace funcione en WhatsApp debes:\n' +
+                      '1. Subir este archivo HTML a un servidor web (GitHub Pages, Netlify, etc.)\n' +
+                      '2. Usar el enlace HTTPS generado desde allí.\n\n' +
+                      'El enlace local NO será clickeable en WhatsApp.');
+            }
+            
+            // Crear modal
+            const modalHTML = `
+                <div id="url-modal" class="modal-overlay">
+                    <div class="modal-content">
+                        <h3 style="color:var(--neon-green); margin-top:0;">🔗 Enlace del Protocolo Generado</h3>
+                        <p style="margin-bottom:10px;">Copia este enlace y compártelo por WhatsApp:</p>
+                        <div style="background:#0a0b1e; border:1px solid var(--neon-blue); border-radius:12px; padding:15px; word-break:break-all; font-family:monospace; margin-bottom:20px;" id="url-text">${url}</div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="btn-green" style="flex:2;" onclick="window.copiarEnlaceModal()">📋 Copiar al portapapeles</button>
+                            <button class="btn-blue" style="flex:1;" onclick="window.open('${url}', '_blank')">🚀 Probar</button>
+                            <button class="btn-red" style="flex:1;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
+                        </div>
+                        <p style="font-size:12px; margin-top:15px; color:#aaa;">Asegúrate de que el enlace comience con https:// para que WhatsApp lo detecte.</p>
+                    </div>
+                </div>
+            `;
+            
+            const oldModal = document.getElementById('url-modal');
+            if (oldModal) oldModal.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            window.copiarEnlaceModal = function() {
+                const urlText = document.getElementById('url-text').innerText;
+                navigator.clipboard.writeText(urlText).then(() => {
+                    alert('✅ ¡Enlace copiado! Ya puedes pegarlo en WhatsApp.');
+                }).catch(() => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = urlText;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('✅ Enlace copiado (método alternativo).');
+                });
+            };
+        }
+
+        // ==========================================
+        // FUNCIONES GITHUB (guardar, borrar, cargar)
+        // ==========================================
+        async function guardarPuntaje(nombre, cedula, puntos, totalPreguntas) {
+            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
+            try {
+                const getResponse = await fetch(apiUrl, {
+                    headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
+                });
+                if (!getResponse.ok) {
+                    if (getResponse.status === 404) {
+                        const nuevoRegistro = [{
+                            nombre, cedula, nota: puntos, total_preguntas: totalPreguntas,
+                            fecha: new Date().toISOString()
+                        }];
+                        const contenidoBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(nuevoRegistro, null, 2))));
+                        const putResponse = await fetch(apiUrl, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${GITHUB_TOKEN}`,
+                                'Accept': 'application/vnd.github.v3+json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ message: `Crear resultados.json con ${nombre}`, content: contenidoBase64 })
+                        });
+                        if (!putResponse.ok) throw new Error('Error al crear archivo nuevo');
+                        return true;
+                    }
+                    throw new Error(`Error GET: ${getResponse.status}`);
+                }
+                const fileData = await getResponse.json();
+                const sha = fileData.sha;
+                const contenidoStr = atob(fileData.content);
+                let resultados = JSON.parse(contenidoStr);
+                if (!Array.isArray(resultados)) resultados = [];
+                resultados.push({
+                    nombre, cedula, nota: puntos, total_preguntas: totalPreguntas,
+                    fecha: new Date().toISOString()
+                });
+                const nuevoContenidoBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(resultados, null, 2))));
+                const putResponse = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: `➕ Agregar resultado de ${nombre}`, content: nuevoContenidoBase64, sha })
+                });
+                if (!putResponse.ok) throw new Error('Error PUT');
+                return true;
+            } catch (error) {
+                console.error(error);
+                throw error;
+            }
+        }
+
+        async function borrarRegistroPorCedula(cedula) {
+            if (!confirm(`¿Estás seguro de eliminar el registro con cédula ${cedula}?`)) return;
+            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
+            try {
+                const getResponse = await fetch(apiUrl, { headers: { 'Authorization': `token ${GITHUB_TOKEN}` } });
+                if (!getResponse.ok) throw new Error('Error al obtener archivo');
+                const fileData = await getResponse.json();
+                const sha = fileData.sha;
+                const contenidoStr = atob(fileData.content);
+                let resultados = JSON.parse(contenidoStr);
+                const resultadosFiltrados = resultados.filter(r => r.cedula !== cedula);
+                const nuevoContenidoBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(resultadosFiltrados, null, 2))));
+                const putResponse = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: `🗑️ Eliminar registro cédula ${cedula}`, content: nuevoContenidoBase64, sha })
+                });
+                if (!putResponse.ok) throw new Error('Error al actualizar');
+                alert('✅ Registro eliminado');
+                abrirPanelNotas();
+            } catch (error) {
+                alert('❌ Error al eliminar');
+            }
+        }
+
+        async function borrarTodosLosRegistros() {
+            if (!confirm('⚠️ ¿Eliminar TODOS los registros?')) return;
+            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
+            try {
+                const getResponse = await fetch(apiUrl, { headers: { 'Authorization': `token ${GITHUB_TOKEN}` } });
+                if (!getResponse.ok) {
+                    if (getResponse.status === 404) { alert('No hay registros'); return; }
+                    throw new Error('Error al obtener archivo');
+                }
+                const fileData = await getResponse.json();
+                const sha = fileData.sha;
+                const contenidoVacio = [];
+                const nuevoContenidoBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(contenidoVacio, null, 2))));
+                const putResponse = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: `🗑️🗑️🗑️ ELIMINAR TODOS LOS REGISTROS`, content: nuevoContenidoBase64, sha })
+                });
+                if (!putResponse.ok) throw new Error('Error al actualizar');
+                alert('✅ Todos los registros eliminados');
+                abrirPanelNotas();
+            } catch (error) {
+                alert('❌ Error al eliminar');
+            }
+        }
+
+        async function abrirPanelNotas() {
+            if (!esProfesor || quizCompletado) {
+                alert('⛔ Acceso denegado. Los alumnos no pueden acceder al panel de notas.');
+                return;
+            }
+            document.getElementById('editor-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            const tbody = document.getElementById('notas-body');
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Cargando registros desde GitHub...</td></tr>`;
+            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
+            try {
+                const response = await fetch(apiUrl, { headers: { 'Authorization': `token ${GITHUB_TOKEN}` } });
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Aún no hay alumnos evaluados.</td></tr>`;
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--neon-pink);">Error al cargar: ${response.status}</td></tr>`;
+                    }
+                    return;
+                }
+                const fileData = await response.json();
+                const contenidoStr = atob(fileData.content);
+                const resultados = JSON.parse(contenidoStr);
+                if (!Array.isArray(resultados) || resultados.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Aún no hay registros.</td></tr>`;
+                    return;
+                }
+                resultados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                tbody.innerHTML = '';
+                resultados.forEach(fila => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${fila.nombre || ''}</td>
+                            <td>${fila.cedula || ''}</td>
+                            <td><strong style="color:var(--neon-green)">${fila.nota || 0} / ${fila.total_preguntas || '?'}</strong></td>
+                            <td><button class="btn-delete" onclick="borrarRegistroPorCedula('${fila.cedula}')" style="padding: 5px 10px;">🗑️ Eliminar</button></td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--neon-pink);">Error de conexión</td></tr>`;
+            }
+        }
+
+        function cerrarPanelNotas() {
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('editor-view').classList.remove('hidden');
+        }
+
+        // ==========================================
+        // FLUJO DEL ALUMNO
+        // ==========================================
+        function init() {
+            const params = new URLSearchParams(window.location.search);
+            if(params.has('quiz')) {
+                try {
+                    const encoded = params.get('quiz');
+                    const jsonString = decodeBase64(encoded);
+                    const decoded = JSON.parse(jsonString);
+                    quizData = decoded.questions;
+                    window.quizTime = parseInt(decoded.time);
+                    esProfesor = false;
+                    quizCompletado = false;
+                    document.getElementById('editor-view').classList.add('hidden');
+                    document.getElementById('login-view').classList.remove('hidden');
+                } catch(e) {
+                    alert("Error al cargar el quiz. El enlace puede estar dañado o ser incompatible.");
+                    location.href = location.pathname;
+                }
+            } else {
+                esProfesor = true;
+                quizCompletado = false;
+                addQuestion();
+            }
+        }
+
+        function iniciarProtocoloAlumno() {
+            const nombre = document.getElementById('student-name').value.trim();
+            const cedula = document.getElementById('student-id').value.trim();
+            if(nombre === "" || cedula === "") {
+                alert("Por favor, completa tus datos.");
+                return;
+            }
+            studentProfile.name = nombre;
+            studentProfile.id = cedula;
+            studentScore = 0; 
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentIndex];
+            document.getElementById('display-q').innerText = q.q;
+            const displayImg = document.getElementById('display-img');
+            if(q.img && q.img.trim() !== "") {
+                displayImg.src = q.img;
+                displayImg.classList.remove('hidden');
+            } else {
+                displayImg.classList.add('hidden');
+            }
+            const optionsGrid = document.getElementById('display-options');
+            optionsGrid.innerHTML = '';
+            selectedIdx = null;
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+            shuffledOptions.forEach((opt, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'opt-btn';
+                btn.innerText = opt.text;
+                btn.onclick = () => {
+                    document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedIdx = index;
+                    window.lastSelectedIsCorrect = opt.correct;
+                    window.lastCorrectText = q.options.find(o => o.correct).text;
+                };
+                optionsGrid.appendChild(btn);
+            });
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = window.quizTime;
+            const bar = document.getElementById('timer-fill');
+            bar.style.transition = 'none';
+            bar.style.width = '100%';
+            bar.style.backgroundColor = 'var(--neon-blue)';
+            setTimeout(() => {
+                bar.style.transition = `width ${timeLeft}s linear`;
+                bar.style.width = '0%';
+            }, 50);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                if(timeLeft <= 5) {
+                    bar.style.backgroundColor = 'var(--neon-pink)';
+                    bar.style.boxShadow = '0 0 15px var(--neon-pink)';
+                }
+                if(timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function validateSelection() {
+            if(selectedIdx === null) return;
+            clearInterval(timerInterval);
+            if(window.lastSelectedIsCorrect) studentScore++;
+            showFeedback(window.lastSelectedIsCorrect);
+        }
+
+        function handleTimeOut() {
+            showFeedback(false, "SISTEMA: TIEMPO AGOTADO");
+        }
+
+        function showFeedback(isCorrect, customTitle) {
+            if (autoNextTimer) clearTimeout(autoNextTimer);
+            const bar = document.getElementById('feedback-bar');
+            const title = document.getElementById('fb-title');
+            const sub = document.getElementById('fb-sub');
+            const btn = document.getElementById('fb-btn');
+            bar.className = 'feedback-bar show ' + (isCorrect ? 'correct-bg' : 'wrong-bg');
+            title.innerText = customTitle || (isCorrect ? "¡Sincronización Exitosa!" : "Error de Datos");
+            title.style.color = isCorrect ? "var(--neon-green)" : "var(--neon-pink)";
+            
+            if(!isCorrect) {
+                sub.innerText = `Dato esperado: ${window.lastCorrectText}`;
+                autoNextTimer = setTimeout(() => { nextQuestion(); }, 2000);
+                btn.innerText = "Siguiente (auto)";
+            } else {
+                sub.innerText = "Incrementando puntuación...";
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 }, colors: ['#39ff14', '#00f3ff', '#ff00e0'] });
+                btn.innerText = "Siguiente";
+            }
+            btn.className = isCorrect ? 'btn-green' : 'btn-red';
+        }
+
+        function nextQuestion() {
+            if (autoNextTimer) {
+                clearTimeout(autoNextTimer);
+                autoNextTimer = null;
+            }
+            document.getElementById('feedback-bar').classList.remove('show');
+            currentIndex++;
+            if(currentIndex < quizData.length) {
+                renderQuestion();
+            } else {
+                finalizarYCargarNotas();
+            }
+        }
+
+        async function finalizarYCargarNotas() {
+            const total = quizData.length;
+            quizCompletado = true;
+            document.getElementById('game-content').innerHTML = `<div style="text-align:center;"><h2 style="color:var(--neon-blue);">ENVIANDO RESULTADOS A GITHUB...</h2></div>`;
+            document.getElementById('main-check-btn').classList.add('hidden');
+            document.getElementById('timer-fill').parentElement.classList.add('hidden');
+            let exito = false, errorMsg = '';
+            try {
+                await guardarPuntaje(studentProfile.name, studentProfile.id, studentScore, total);
+                exito = true;
+            } catch (e) { errorMsg = e.message; }
+            
+            document.getElementById('game-content').innerHTML = `
+                <div style="animation: fadeIn 1s ease;">
+                    <h1 style="color: var(--neon-green); font-size: 35px;">MISIÓN CUMPLIDA</h1>
+                    <p style="font-size: 20px;">Estudiante: <span style="color:var(--neon-blue)">${studentProfile.name}</span></p>
+                    <p style="font-size: 24px; font-weight: 700;">Nota: ${studentScore} / ${total}</p>
+                    <div style="padding: 10px; margin: 20px auto; max-width: 300px; border: 1px solid ${exito ? 'var(--neon-green)' : 'var(--neon-pink)'}; border-radius: 10px;">
+                        ${exito ? '✅ Datos guardados en GitHub' : '❌ Error: ' + errorMsg}
+                    </div>
+                    <div style="margin-top: 30px; padding: 20px; background: #0f1225; border-radius: 15px; border: 1px solid var(--neon-blue);">
+                        <h3 style="color: var(--neon-blue); margin: 0 0 10px;">🔒 Sesión finalizada</h3>
+                        <p style="font-size: 18px; margin: 0;">Ya puedes cerrar esta página de forma segura.</p>
+                    </div>
+                </div>
+            `;
+            esProfesor = false;
+        }
+
+        window.addEventListener('popstate', function() {
+            if (!esProfesor && !quizCompletado) {
+                if (confirm('¿Abandonar el quiz? Perderás tu progreso.')) location.href = location.pathname;
+                else history.pushState(null, null, location.href);
+            }
+        });
+
+        window.onload = init;
+    </script>
+</body>
+</html>
