@@ -115,6 +115,7 @@
             background: #ff0000; 
             box-shadow: 0 0 15px #ff0000;
         }
+        /* Estilos para el modal de exportación */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(10,11,30,0.95); z-index: 9999;
@@ -151,10 +152,10 @@
         </div>
     </div>
 
-    <!-- PANEL DE NOTAS (PROFESOR) -->
+    <!-- PANEL DE NOTAS (PROFESOR) - AHORA USA LOCALSTORAGE -->
     <div id="dashboard-view" class="container hidden">
         <div class="q-card" style="border-color: #9d00ff;">
-            <h2 style="color: #9d00ff; text-align: center;">BASE DE DATOS (Google Sheets)</h2>
+            <h2 style="color: #9d00ff; text-align: center;">BASE DE DATOS LOCAL (Este navegador)</h2>
             <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
                 <button class="btn-delete" onclick="borrarTodosLosRegistros()" style="padding: 10px 20px;">🗑️ BORRAR TODOS LOS REGISTROS</button>
             </div>
@@ -168,6 +169,7 @@
                     </tbody>
                 </table>
             </div>
+            <p style="font-size:14px; margin-top:15px; color:#aaa;">📧 Los resultados también se envían a tu correo (Formspree).</p>
             <button class="btn-blue" style="width: 100%; margin-top: 20px;" onclick="cerrarPanelNotas()">Volver al Editor</button>
         </div>
     </div>
@@ -209,9 +211,10 @@
 
     <script>
         // ==========================================
-        // CONFIGURACIÓN DE GOOGLE SHEETS
+        // CONFIGURACIÓN (FORMSPREE + LOCALSTORAGE)
         // ==========================================
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwl7DchJSUb6NZLmFwVbhvXslZgPWFC8N_ekI9ZQD69Khil6gCP778k0dl47ZBUP5ODA/exec';
+        const FORMSPREE_URL = 'https://formspree.io/f/mlgawnkq'; // Tu endpoint
+        const STORAGE_KEY = 'duoquiz_resultados'; // Clave para localStorage
 
         // ==========================================
         // FUNCIONES DE CODIFICACIÓN SEGURA
@@ -249,7 +252,7 @@
         let quizCompletado = false;
 
         // ==========================================
-        // FUNCIONES DEL EDITOR
+        // FUNCIONES DEL EDITOR (PROFESOR)
         // ==========================================
         function addQuestion() {
             const id = Date.now();
@@ -335,53 +338,76 @@
         }
 
         // ==========================================
-        // FUNCIONES GOOGLE SHEETS
+        // FUNCIONES DE ALMACENAMIENTO (LOCALSTORAGE + CORREO)
         // ==========================================
-        async function guardarPuntaje(nombre, cedula, puntos, totalPreguntas) {
-            const url = `${SCRIPT_URL}?action=guardar&nombre=${encodeURIComponent(nombre)}&cedula=${encodeURIComponent(cedula)}&nota=${puntos}&total=${totalPreguntas}`;
-            try {
-                const response = await fetch(url);
-                const text = await response.text();
-                if (text.trim() !== 'OK') throw new Error('Error del servidor: ' + text);
-                return true;
-            } catch (error) {
-                console.error(error);
-                alert('❌ Error al guardar en Google Sheets:\n' + error.message);
-                throw error;
-            }
+        function guardarLocalmente(registro) {
+            let registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            registros.push(registro);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
         }
 
-        async function obtenerRegistros() {
-            const url = `${SCRIPT_URL}?action=obtener`;
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                return data; // array de arrays: [nombre, cedula, nota, total, fecha]
-            } catch (error) {
-                console.error(error);
-                throw error;
-            }
-        }
+        async function enviarResultadosPorCorreo(nombre, cedula, puntos, total) {
+            const datos = {
+                nombre: nombre,
+                cedula: cedula,
+                nota: puntos,
+                total_preguntas: total,
+                fecha: new Date().toLocaleString()
+            };
 
-        async function borrarTodosLosRegistros() {
-            if (!confirm('⚠️ ¿Eliminar TODOS los registros de la hoja de cálculo?')) return;
-            const url = `${SCRIPT_URL}?action=borrar`;
             try {
-                const response = await fetch(url);
-                const text = await response.text();
-                if (text.trim() === 'OK') {
-                    alert('✅ Todos los registros eliminados');
-                    abrirPanelNotas();
+                const response = await fetch(FORMSPREE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                if (response.ok) {
+                    console.log('✅ Correo enviado correctamente');
+                    return true;
                 } else {
-                    throw new Error('Respuesta inesperada');
+                    console.error('Error al enviar correo:', response.statusText);
+                    return false;
                 }
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                console.error('Error de conexión al enviar correo:', error);
+                return false;
             }
+        }
+
+        async function guardarPuntaje(nombre, cedula, puntos, totalPreguntas) {
+            // 1. Guardar en localStorage SIEMPRE (para el panel de notas)
+            const registro = {
+                nombre, cedula, nota: puntos, total_preguntas: totalPreguntas,
+                fecha: new Date().toISOString()
+            };
+            guardarLocalmente(registro);
+
+            // 2. Enviar por correo (Formspree)
+            const correoEnviado = await enviarResultadosPorCorreo(nombre, cedula, puntos, totalPreguntas);
+            
+            if (!correoEnviado) {
+                console.warn('El correo no pudo enviarse, pero el resultado se guardó localmente.');
+            }
+            return true;
+        }
+
+        function obtenerRegistrosLocales() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        }
+
+        function borrarTodosLosRegistros() {
+            if (!confirm('⚠️ ¿Eliminar TODOS los registros locales?')) return;
+            localStorage.removeItem(STORAGE_KEY);
+            alert('✅ Registros locales eliminados');
+            abrirPanelNotas();
         }
 
         function borrarRegistroPorCedula(cedula) {
-            alert('Para eliminar un registro individual, ábrelo directamente en tu hoja de Google Sheets.');
+            if (!confirm(`¿Eliminar registro con cédula ${cedula}?`)) return;
+            let registros = obtenerRegistrosLocales();
+            registros = registros.filter(r => r.cedula !== cedula);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
+            abrirPanelNotas();
         }
 
         async function abrirPanelNotas() {
@@ -392,29 +418,26 @@
             document.getElementById('editor-view').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
             const tbody = document.getElementById('notas-body');
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Cargando registros desde Google Sheets...</td></tr>`;
-            try {
-                const registros = await obtenerRegistros();
-                if (!registros || registros.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Aún no hay registros.</td></tr>`;
-                    return;
-                }
-                // Ordenar por fecha descendente (índice 4)
-                registros.sort((a, b) => new Date(b[4]) - new Date(a[4]));
-                tbody.innerHTML = '';
-                registros.forEach(fila => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${fila[0] || ''}</td>
-                            <td>${fila[1] || ''}</td>
-                            <td><strong style="color:var(--neon-green)">${fila[2] || 0} / ${fila[3] || '?'}</strong></td>
-                            <td><button class="btn-delete" onclick="borrarRegistroPorCedula('${fila[1]}')">🗑️</button></td>
-                        </tr>
-                    `;
-                });
-            } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="4" style="color:var(--neon-pink);">Error de conexión</td></tr>`;
+            
+            const registros = obtenerRegistrosLocales();
+            if (registros.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Aún no hay registros locales.</td></tr>`;
+                return;
             }
+            
+            // Ordenar por fecha descendente
+            registros.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            tbody.innerHTML = '';
+            registros.forEach(fila => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${fila.nombre || ''}</td>
+                        <td>${fila.cedula || ''}</td>
+                        <td><strong style="color:var(--neon-green)">${fila.nota || 0} / ${fila.total_preguntas || '?'}</strong></td>
+                        <td><button class="btn-delete" onclick="borrarRegistroPorCedula('${fila.cedula}')">🗑️</button></td>
+                    </tr>
+                `;
+            });
         }
 
         function cerrarPanelNotas() {
@@ -568,9 +591,10 @@
         async function finalizarYCargarNotas() {
             const total = quizData.length;
             quizCompletado = true;
-            document.getElementById('game-content').innerHTML = `<div style="text-align:center;"><h2 style="color:var(--neon-blue);">ENVIANDO RESULTADOS A GOOGLE SHEETS...</h2></div>`;
+            document.getElementById('game-content').innerHTML = `<div style="text-align:center;"><h2 style="color:var(--neon-blue);">ENVIANDO RESULTADOS...</h2></div>`;
             document.getElementById('main-check-btn').classList.add('hidden');
             document.getElementById('timer-fill').parentElement.classList.add('hidden');
+            
             let exito = false, errorMsg = '';
             try {
                 await guardarPuntaje(studentProfile.name, studentProfile.id, studentScore, total);
@@ -583,7 +607,7 @@
                     <p style="font-size: 20px;">Estudiante: <span style="color:var(--neon-blue)">${studentProfile.name}</span></p>
                     <p style="font-size: 24px; font-weight: 700;">Nota: ${studentScore} / ${total}</p>
                     <div style="padding: 10px; margin: 20px auto; max-width: 300px; border: 1px solid ${exito ? 'var(--neon-green)' : 'var(--neon-pink)'}; border-radius: 10px;">
-                        ${exito ? '✅ Datos guardados en Google Sheets' : '❌ Error: ' + errorMsg}
+                        ${exito ? '✅ Resultados enviados por correo' : '❌ Error: ' + errorMsg}
                     </div>
                     <div style="margin-top: 30px; padding: 20px; background: #0f1225; border-radius: 15px; border: 1px solid var(--neon-blue);">
                         <h3 style="color: var(--neon-blue); margin: 0 0 10px;">🔒 Sesión finalizada</h3>
