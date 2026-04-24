@@ -48,7 +48,7 @@
         input { width:100%; padding:14px; margin:10px 0; background:#0f1225; border:2px solid #2d345e; border-radius:14px; font-family:inherit; color:white; box-sizing:border-box; font-size:16px; transition:0.3s; -webkit-appearance:none; }
         input:focus { border-color:var(--neon-blue); outline:none; box-shadow:0 0 10px var(--neon-blue-dark); }
         .option-edit-row { display:flex; gap:12px; align-items:center; margin-bottom:8px; }
-        .is-correct-check { width:30px !important; height:30px; cursor:pointer; accent-color:var(--neon-green); margin:0; }
+        .is-correct-radio { width:20px; height:20px; cursor:pointer; accent-color:var(--neon-green); margin:0; }
         .progress-container { width:100%; height:14px; background:#1a1f4d; border-radius:20px; margin:25px 0; overflow:hidden; border:1px solid var(--neon-blue-dark); }
         #timer-fill { height:100%; background:var(--neon-blue); width:100%; box-shadow:0 0 15px var(--neon-blue); transition:width 1s linear; }
         .quiz-img { max-width:100%; max-height:250px; object-fit:contain; border-radius:18px; margin-bottom:20px; background:#000; border:2px solid var(--neon-blue); box-shadow:0 0 15px rgba(0,243,255,0.3); }
@@ -119,11 +119,13 @@
 <!-- MODAL DE IMPORTACIÓN -->
 <div id="import-modal" class="modal-overlay hidden">
     <div class="modal-content">
-        <h3 style="color:var(--neon-orange); margin-top:0;">📥 Importar Quiz desde texto</h3>
-        <p style="font-size:14px; color:#aaa;">Pega el contenido con el formato:<br>
-        <code>Pregunta (una línea)<br>*Opción correcta<br>Opción incorrecta</code><br>
-        Separa cada pregunta con una línea en blanco.</p>
-        <textarea id="import-text" placeholder="¿Capital de Francia?&#10;*París&#10;Londres&#10;Madrid&#10;&#10;¿2+2?&#10;*4&#10;3&#10;5"></textarea>
+        <h3 style="color:var(--neon-green); margin-top:0;">📥 Importar Quiz desde texto</h3>
+        <p style="font-size:14px; color:#aaa;">Pega el contenido con uno de estos formatos:<br>
+        <strong>Formato 1 (recomendado):</strong><br>
+        <code>1. ¿Pregunta?<br>a) Opción 1<br>b) Opción 2<br>...<br>Respuesta: b</code><br><br>
+        <strong>Formato 2:</strong><br>
+        <code>¿Pregunta?<br>*Opción correcta<br>Opción incorrecta</code></p>
+        <textarea id="import-text" placeholder="Pega aquí el texto del cuestionario..."></textarea>
         <div style="display:flex; gap:10px; margin-top:15px;">
             <button class="btn-green" style="flex:2;" onclick="importarQuiz()">✅ Importar y reemplazar</button>
             <button class="btn-red" style="flex:1;" onclick="document.getElementById('import-modal').classList.add('hidden')">Cancelar</button>
@@ -207,7 +209,7 @@
     }
 
     // ==========================================
-    // FORMATEO DE TEXTO: Primera mayúscula, resto minúsculas
+    // FORMATEO DE TEXTO
     // ==========================================
     function capitalizarFrase(texto) {
         if (!texto || typeof texto !== 'string') return texto;
@@ -230,7 +232,7 @@
     let lastCorrectText = "";
 
     // ==========================================
-    // GESTIÓN DE CONFIGURACIÓN TELEGRAM (con valores por defecto)
+    // GESTIÓN DE CONFIGURACIÓN TELEGRAM
     // ==========================================
     function obtenerConfigTelegram() {
         const saved = localStorage.getItem(TELEGRAM_CONFIG_KEY);
@@ -271,8 +273,8 @@
 
     function cargarConfigTelegramEnForm() {
         const { token, chatid } = obtenerConfigTelegram();
-        document.getElementById('tg-token').value = token;
-        document.getElementById('tg-chatid').value = chatid;
+        document.getElementById('tg-token').value = token || '';
+        document.getElementById('tg-chatid').value = chatid || '';
     }
 
     // ==========================================
@@ -295,26 +297,30 @@
     }
 
     // ==========================================
-    // FUNCIONES DEL EDITOR
+    // FUNCIONES DEL EDITOR (con radio buttons)
     // ==========================================
+    function generarIdPregunta() {
+        return 'q' + Date.now() + Math.random().toString(36).substr(2, 5);
+    }
+
     function addQuestion() {
-        const id = Date.now();
+        const id = generarIdPregunta();
         const html = `
-            <div class="q-card" id="q-${id}">
+            <div class="q-card" id="${id}">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <strong style="color: var(--neon-blue)"># Módulo de Pregunta</strong>
-                    <button onclick="document.getElementById('q-${id}').remove()" style="background:none; color:var(--neon-pink); padding:0; font-size:12px;">[ ELIMINAR ]</button>
+                    <button onclick="document.getElementById('${id}').remove()" style="background:none; color:var(--neon-pink); padding:0; font-size:12px;">[ ELIMINAR ]</button>
                 </div>
                 <input type="text" class="q-text" placeholder="Escribe el desafío aquí...">
                 <input type="text" class="q-img" placeholder="URL de imagen (opcional)">
                 <div class="options-area">
                     <div class="option-edit-row">
-                        <input type="checkbox" class="is-correct-check" checked onclick="exclusiveCheck(this)">
+                        <input type="radio" name="${id}" class="is-correct-radio" checked>
                         <input type="text" class="opt-text" placeholder="Opción Correcta">
                         <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
                     </div>
                     <div class="option-edit-row">
-                        <input type="checkbox" class="is-correct-check" onclick="exclusiveCheck(this)">
+                        <input type="radio" name="${id}" class="is-correct-radio">
                         <input type="text" class="opt-text" placeholder="Opción de Distracción">
                         <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
                     </div>
@@ -325,21 +331,12 @@
         document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
     }
 
-    // Exclusividad de checkboxes: solo uno marcado por grupo
-    function exclusiveCheck(chk) {
-        if (!chk.checked) return;
-        const row = chk.closest('.option-edit-row');
-        const container = row.parentElement;
-        container.querySelectorAll('.is-correct-check').forEach(cb => {
-            if (cb !== chk) cb.checked = false;
-        });
-    }
-
     function addOptionToQuestion(qId) {
-        const container = document.querySelector(`#q-${qId} .options-area`);
+        const container = document.querySelector(`#${qId} .options-area`);
+        if (!container) return;
         const html = `
             <div class="option-edit-row">
-                <input type="checkbox" class="is-correct-check" onclick="exclusiveCheck(this)">
+                <input type="radio" name="${qId}" class="is-correct-radio">
                 <input type="text" class="opt-text" placeholder="Opción adicional">
                 <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
             </div>
@@ -348,10 +345,11 @@
     }
 
     // ==========================================
-    // IMPORTADOR DE QUIZ DESDE TEXTO
+    // IMPORTADOR DE QUIZ MEJORADO
     // ==========================================
     function abrirImportador() {
         document.getElementById('import-modal').classList.remove('hidden');
+        document.getElementById('import-text').focus();
     }
 
     function importarQuiz() {
@@ -360,10 +358,21 @@
             alert('Pega el texto del quiz.');
             return;
         }
-        // Separar por bloques (línea en blanco)
-        const bloques = texto.split(/\n\s*\n/).filter(b => b.trim() !== '');
+
+        // Decidir formato: buscar "Respuesta:" en el texto (formato 1) o "*" (formato 2)
+        const usaFormatoRespuesta = /Respuesta\s*:\s*[a-dA-D]/i.test(texto);
+
+        let bloques;
+        if (usaFormatoRespuesta) {
+            // Formato: preguntas separadas por números (1. 2. etc.)
+            bloques = texto.split(/\n(?=\d+\. )/).filter(b => b.trim() !== '');
+        } else {
+            // Formato antiguo: separar por líneas en blanco
+            bloques = texto.split(/\n\s*\n/).filter(b => b.trim() !== '');
+        }
+
         if (bloques.length === 0) {
-            alert('No se encontraron preguntas.');
+            alert('No se encontraron preguntas. Revisa el formato.');
             return;
         }
 
@@ -372,21 +381,17 @@
 
         bloques.forEach(bloque => {
             const lineas = bloque.split('\n').map(l => l.trim()).filter(l => l !== '');
-            if (lineas.length < 2) return; // necesita al menos pregunta y una opción
-            const pregunta = lineas[0];
-            const opciones = lineas.slice(1).map(linea => {
-                const esCorrecta = linea.startsWith('*');
-                const textoOpcion = esCorrecta ? linea.substring(1).trim() : linea.trim();
-                return { text: textoOpcion, correct: esCorrecta };
-            });
+            if (lineas.length < 2) return;
 
-            if (opciones.length === 0) return;
-            // Si ninguna está marcada como correcta, la primera será la correcta
-            if (!opciones.some(o => o.correct)) {
-                opciones[0].correct = true;
+            try {
+                if (usaFormatoRespuesta) {
+                    procesarBloqueFormatoRespuesta(lineas);
+                } else {
+                    procesarBloqueFormatoAsterisco(lineas);
+                }
+            } catch (e) {
+                console.warn('Error procesando bloque:', bloque, e);
             }
-
-            crearPreguntaConDatos(pregunta, '', opciones);
         });
 
         document.getElementById('import-modal').classList.add('hidden');
@@ -394,21 +399,64 @@
         alert('✅ Quiz importado correctamente.');
     }
 
+    function procesarBloqueFormatoRespuesta(lineas) {
+        // Primera línea: "1. Pregunta?"
+        let primera = lineas.shift();
+        // Quitar número inicial (ej: "1. ")
+        const pregunta = primera.replace(/^\d+\.\s*/, '');
+
+        // Buscar línea de respuesta
+        let idxRespuesta = lineas.findIndex(l => /^Respuesta\s*:\s*[a-dA-D]/i.test(l));
+        if (idxRespuesta === -1) throw new Error('No se encontró línea de respuesta');
+
+        const lineaRespuesta = lineas.splice(idxRespuesta, 1)[0];
+        const letraCorrecta = lineaRespuesta.match(/Respuesta\s*:\s*([a-dA-D])/i)[1].toLowerCase();
+
+        // Las líneas restantes son opciones (a) ..., b) ..., etc.)
+        const opciones = lineas.map(l => {
+            const match = l.match(/^([a-d])\)\s*(.+)/i);
+            if (!match) throw new Error('Formato de opción incorrecto: ' + l);
+            const letra = match[1].toLowerCase();
+            const texto = match[2];
+            return {
+                text: texto,
+                correct: letra === letraCorrecta
+            };
+        });
+
+        if (opciones.length === 0) throw new Error('No hay opciones');
+        // Asegurar al menos una correcta
+        if (!opciones.some(o => o.correct)) opciones[0].correct = true;
+
+        crearPreguntaConDatos(pregunta, '', opciones);
+    }
+
+    function procesarBloqueFormatoAsterisco(lineas) {
+        const pregunta = lineas.shift();
+        const opciones = lineas.map(linea => {
+            const esCorrecta = linea.startsWith('*');
+            const texto = esCorrecta ? linea.substring(1).trim() : linea.trim();
+            return { text: texto, correct: esCorrecta };
+        });
+        if (!opciones.some(o => o.correct)) opciones[0].correct = true;
+        crearPreguntaConDatos(pregunta, '', opciones);
+    }
+
     function crearPreguntaConDatos(enunciado, img, opciones) {
-        const id = Date.now() + Math.random();
+        const id = generarIdPregunta();
         const opcionesHTML = opciones.map((op, i) => `
             <div class="option-edit-row">
-                <input type="checkbox" class="is-correct-check" ${op.correct ? 'checked' : ''} onclick="exclusiveCheck(this)">
+                <input type="radio" name="${id}" class="is-correct-radio" ${op.correct ? 'checked' : ''}>
                 <input type="text" class="opt-text" value="${op.text.replace(/"/g, '&quot;')}" placeholder="Opción">
                 <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
             </div>
         `).join('');
 
         const html = `
-            <div class="q-card" id="q-${id}">
+            <div class="q-card" id="${id}">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <strong style="color: var(--neon-blue)"># Módulo de Pregunta</strong>
-                    <button onclick="document.getElementById('q-${id}').remove()" style="background:none; color:var(--neon-pink); padding:0; font-size:12px;">[ ELIMINAR ]</button>
+                    <button onclick="document.getElementById('${id}').remove()" style="background:none; color:var(--neon-pink); padding:0; font-size:12px;">[ ELIMINAR ]</button>
                 </div>
                 <input type="text" class="q-text" value="${enunciado.replace(/"/g, '&quot;')}">
                 <input type="text" class="q-img" value="${img.replace(/"/g, '&quot;')}" placeholder="URL de imagen (opcional)">
@@ -425,7 +473,7 @@
             const optionsRows = card.querySelectorAll('.option-edit-row');
             const options = Array.from(optionsRows).map(row => ({
                 text: row.querySelector('.opt-text').value,
-                correct: row.querySelector('.is-correct-check').checked
+                correct: row.querySelector('.is-correct-radio').checked
             })).filter(o => o.text.trim() !== "");
             return { q: card.querySelector('.q-text').value, img: card.querySelector('.q-img').value, options };
         }).filter(q => q.q.trim() !== "" && q.options.length > 0);
