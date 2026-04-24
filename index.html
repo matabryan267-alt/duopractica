@@ -2,12 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>DuoQuiz Pro - Neon Edition</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ===== ESTILOS (SIN CAMBIOS) ===== */
         :root {
             --neon-green: #39ff14;
             --neon-green-dark: #28cc0d;
@@ -51,7 +50,7 @@
             cursor: pointer; border: none; border-radius: 12px; font-weight: 800;
             font-family: 'Orbitron', sans-serif; text-transform: uppercase;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 14px; padding: 14px 24px;
+            font-size: 14px; padding: 14px 24px; -webkit-appearance: none;
         }
         button:active { transform: scale(0.95); }
         .btn-green { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green-dark); }
@@ -70,6 +69,7 @@
             width: 100%; padding: 14px; margin: 10px 0; background: #0f1225;
             border: 2px solid #2d345e; border-radius: 14px; font-family: inherit;
             color: white; box-sizing: border-box; font-size: 16px; transition: 0.3s;
+            -webkit-appearance: none;
         }
         input:focus { border-color: var(--neon-blue); outline: none; box-shadow: 0 0 10px var(--neon-blue-dark); }
         .option-edit-row { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
@@ -81,7 +81,8 @@
         .opt-btn {
             border: 2px solid #2d345e; background: var(--card-bg); color: var(--text-light);
             border-radius: 18px; padding: 22px; font-size: 18px; text-align: center;
-            font-weight: 700; transition: all 0.2s; cursor: pointer;
+            font-weight: 700; transition: all 0.2s; cursor: pointer; -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
         .opt-btn:hover { border-color: var(--neon-blue); background: #1e2548; }
         .opt-btn.selected {
@@ -103,19 +104,18 @@
         .notas-table th, .notas-table td { padding: 15px; border-bottom: 1px solid #2d345e; text-align: left; }
         .notas-table th { background: #1a1f4d; color: var(--neon-blue); font-family: 'Orbitron'; }
         .notas-table tr:hover { background: #161b33; }
-        .btn-delete { 
-            background: #ff3333; 
-            color: white; 
-            padding: 5px 12px; 
-            font-size: 12px; 
+        .btn-delete {
+            background: #ff3333;
+            color: white;
+            padding: 5px 12px;
+            font-size: 12px;
             border-radius: 8px;
             box-shadow: 0 0 8px #ff0000;
         }
-        .btn-delete:hover { 
-            background: #ff0000; 
+        .btn-delete:hover {
+            background: #ff0000;
             box-shadow: 0 0 15px #ff0000;
         }
-        /* Estilos para el modal de exportación */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(10,11,30,0.95); z-index: 9999;
@@ -133,499 +133,515 @@
 </head>
 <body>
 
-    <div class="header">
-        <div class="logo">DuoQuiz <span style="color: var(--neon-blue)">PRO</span></div>
+<div class="header">
+    <div class="logo">DuoQuiz <span style="color: var(--neon-blue)">PRO</span></div>
+</div>
+
+<!-- AUTENTICACIÓN DEL PROFESOR (si no hay quiz) -->
+<div id="teacher-auth-view" class="container hidden">
+    <div class="q-card" style="border-color: var(--neon-pink); text-align: center;">
+        <h2 style="color: var(--neon-pink)">🔐 ACCESO PROFESOR</h2>
+        <p>Introduce la contraseña para crear o revisar exámenes.</p>
+        <input type="password" id="teacher-password" placeholder="Contraseña">
+        <button class="btn-green" style="width: 100%; margin-top: 15px;" onclick="verificarProfesor()">Acceder</button>
+        <p id="auth-error" style="color: var(--neon-pink); margin-top: 10px; display: none;">Contraseña incorrecta</p>
     </div>
+</div>
 
-    <!-- VISTA EDITOR (PROFESOR) -->
-    <div id="editor-view" class="container">
-        <button class="btn-purple" style="width: 100%; margin-bottom: 25px; padding: 18px; font-size: 16px;" onclick="abrirPanelNotas()">📊 VER NOTAS DE ALUMNOS</button>
-        <div class="q-card" style="border-color: var(--neon-blue);">
-            <h3 style="margin-top:0; color: var(--neon-blue)">⚡ Ajustes de Sistema</h3>
-            <label style="font-weight: 700;">Segundos por pulso:</label>
-            <input type="number" id="global-timer" value="20">
-        </div>
-        <div id="questions-container"></div>
-        <div style="display: flex; gap: 15px; margin-top: 25px;">
-            <button class="btn-blue" onclick="addQuestion()">+ Nueva Pregunta</button>
-            <button class="btn-green" style="flex-grow: 1;" onclick="exportQuiz()">🚀 Desplegar Protocolo</button>
-        </div>
+<!-- VISTA EDITOR (PROFESOR) -->
+<div id="editor-view" class="container hidden">
+    <button class="btn-purple" style="width: 100%; margin-bottom: 25px; padding: 18px; font-size: 16px;" onclick="abrirPanelNotas()">📊 VER NOTAS DE ALUMNOS</button>
+    <div class="q-card" style="border-color: var(--neon-blue);">
+        <h3 style="margin-top:0; color: var(--neon-blue)">⚡ Ajustes de Sistema</h3>
+        <label style="font-weight: 700;">Segundos por pulso:</label>
+        <input type="number" id="global-timer" value="20">
     </div>
-
-    <!-- PANEL DE NOTAS (PROFESOR) - AHORA USA LOCALSTORAGE -->
-    <div id="dashboard-view" class="container hidden">
-        <div class="q-card" style="border-color: #9d00ff;">
-            <h2 style="color: #9d00ff; text-align: center;">BASE DE DATOS LOCAL (Este navegador)</h2>
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
-                <button class="btn-delete" onclick="borrarTodosLosRegistros()" style="padding: 10px 20px;">🗑️ BORRAR TODOS LOS REGISTROS</button>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="notas-table" id="tabla-resultados">
-                    <thead>
-                        <tr><th>Nombre</th><th>Cédula</th><th>Puntuación</th><th>Acciones</th></tr>
-                    </thead>
-                    <tbody id="notas-body">
-                        <tr><td colspan="4" style="text-align: center;">Cargando registros...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <p style="font-size:14px; margin-top:15px; color:#aaa;">📧 Los resultados también se envían a tu correo (Formspree).</p>
-            <button class="btn-blue" style="width: 100%; margin-top: 20px;" onclick="cerrarPanelNotas()">Volver al Editor</button>
-        </div>
+    <div id="questions-container"></div>
+    <div style="display: flex; gap: 15px; margin-top: 25px;">
+        <button class="btn-blue" onclick="addQuestion()">+ Nueva Pregunta</button>
+        <button class="btn-green" style="flex-grow: 1;" onclick="exportQuiz()">🚀 Desplegar Protocolo</button>
     </div>
+</div>
 
-    <!-- LOGIN DEL ALUMNO -->
-    <div id="login-view" class="container hidden">
-        <div class="q-card" style="border-color: var(--neon-pink); text-align: center;">
-            <h2 style="color: var(--neon-pink)">IDENTIFICACIÓN REQUERIDA</h2>
-            <p>Ingresa tus credenciales para iniciar el protocolo.</p>
-            <input type="text" id="student-name" placeholder="Tu Nombre y Apellido" required>
-            <input type="number" id="student-id" placeholder="Cédula de Identidad" required>
-            <button class="btn-green" style="width: 100%; margin-top: 15px;" onclick="iniciarProtocoloAlumno()">Acceder al Sistema</button>
+<!-- PANEL DE NOTAS -->
+<div id="dashboard-view" class="container hidden">
+    <div class="q-card" style="border-color: #9d00ff;">
+        <h2 style="color: #9d00ff; text-align: center;">BASE DE DATOS LOCAL (Este navegador)</h2>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+            <button class="btn-delete" onclick="borrarTodosLosRegistros()" style="padding: 10px 20px;">🗑️ BORRAR TODOS LOS REGISTROS</button>
         </div>
+        <div style="overflow-x: auto;">
+            <table class="notas-table" id="tabla-resultados">
+                <thead>
+                <tr><th>Nombre</th><th>Cédula</th><th>Puntuación</th><th>Acciones</th></tr>
+                </thead>
+                <tbody id="notas-body">
+                <tr><td colspan="4" style="text-align: center;">Cargando registros...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="font-size:14px; margin-top:15px; color:#aaa;">📧 Los resultados también se envían a tu correo (Formspree).</p>
+        <button class="btn-blue" style="width: 100%; margin-top: 20px;" onclick="cerrarPanelNotas()">Volver al Editor</button>
     </div>
+</div>
 
-    <!-- QUIZ DEL ALUMNO -->
-    <div id="quiz-view" class="container hidden">
-        <div class="progress-container"><div id="timer-fill"></div></div>
-        <div id="game-content" style="text-align: center;">
-            <img id="display-img" class="quiz-img hidden" src="" alt="imagen pregunta">
-            <h1 id="display-q" style="font-size: 28px; margin-bottom: 30px; text-shadow: 0 0 8px rgba(255,255,255,0.2);"></h1>
-            <div id="display-options" class="options-grid"></div>
-        </div>
-        <div style="text-align: center; margin-top: 50px;">
-            <button id="main-check-btn" class="btn-green" style="width: 80%; padding: 22px; font-size: 18px;" onclick="validateSelection()">Validar Respuesta</button>
-        </div>
+<!-- LOGIN DEL ALUMNO -->
+<div id="login-view" class="container hidden">
+    <div class="q-card" style="border-color: var(--neon-pink); text-align: center;">
+        <h2 style="color: var(--neon-pink)">IDENTIFICACIÓN REQUERIDA</h2>
+        <p>Ingresa tus credenciales para iniciar el protocolo.</p>
+        <input type="text" id="student-name" placeholder="Tu Nombre y Apellido" required>
+        <input type="number" id="student-id" placeholder="Cédula de Identidad" required>
+        <button class="btn-green" style="width: 100%; margin-top: 15px;" onclick="iniciarProtocoloAlumno()">Acceder al Sistema</button>
     </div>
+</div>
 
-    <!-- BARRA DE FEEDBACK -->
-    <div id="feedback-bar" class="feedback-bar">
-        <div class="feedback-content">
-            <div class="feedback-text">
-                <h2 id="fb-title"></h2>
-                <p id="fb-sub"></p>
-            </div>
-            <button id="fb-btn" onclick="nextQuestion()" style="padding: 15px 40px; font-size: 16px;"></button>
-        </div>
+<!-- QUIZ DEL ALUMNO -->
+<div id="quiz-view" class="container hidden">
+    <div class="progress-container"><div id="timer-fill"></div></div>
+    <div id="game-content" style="text-align: center;">
+        <img id="display-img" class="quiz-img hidden" src="" alt="imagen pregunta">
+        <h1 id="display-q" style="font-size: 28px; margin-bottom: 30px; text-shadow: 0 0 8px rgba(255,255,255,0.2);"></h1>
+        <div id="display-options" class="options-grid"></div>
     </div>
+    <div style="text-align: center; margin-top: 50px;">
+        <button id="main-check-btn" class="btn-green" style="width: 80%; padding: 22px; font-size: 18px;" onclick="validateSelection()">Validar Respuesta</button>
+    </div>
+</div>
 
-    <script>
-        // ==========================================
-        // CONFIGURACIÓN (FORMSPREE + LOCALSTORAGE)
-        // ==========================================
-        const FORMSPREE_URL = 'https://formspree.io/f/mlgawnkq'; // Tu endpoint
-        const STORAGE_KEY = 'duoquiz_resultados'; // Clave para localStorage
+<!-- BARRA DE FEEDBACK -->
+<div id="feedback-bar" class="feedback-bar">
+    <div class="feedback-content">
+        <div class="feedback-text">
+            <h2 id="fb-title"></h2>
+            <p id="fb-sub"></p>
+        </div>
+        <button id="fb-btn" onclick="nextQuestion()" style="padding: 15px 40px; font-size: 16px;"></button>
+    </div>
+</div>
 
-        // ==========================================
-        // FUNCIONES DE CODIFICACIÓN SEGURA
-        // ==========================================
-        function encodeBase64(str) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(str);
-            let binary = '';
-            for (let i = 0; i < data.length; i++) binary += String.fromCharCode(data[i]);
-            return btoa(binary);
+<script>
+    // ==========================================
+    // CONFIGURACIÓN
+    // ==========================================
+    const FORMSPREE_URL = 'https://formspree.io/f/mlgawnkq'; // Tu endpoint
+    const STORAGE_KEY = 'duoquiz_resultados';
+    const TEACHER_PASSWORD = 'profe123'; // Cambia esta contraseña
+
+    // ==========================================
+    // CODIFICACIÓN COMPATIBLE (sin TextDecoder)
+    // ==========================================
+    function encodeBase64(str) {
+        // Convierte a Base64 seguro para URL
+        const utf8Bytes = unescape(encodeURIComponent(str));
+        return btoa(utf8Bytes);
+    }
+
+    function decodeBase64(base64) {
+        // Decodifica Base64 a string UTF-8
+        try {
+            const binary = atob(base64);
+            return decodeURIComponent(escape(binary));
+        } catch (e) {
+            return null;
         }
+    }
 
-        function decodeBase64(base64) {
-            try {
-                const binary = atob(base64);
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-                return new TextDecoder().decode(bytes);
-            } catch (e) {
-                return decodeURIComponent(escape(atob(base64)));
-            }
-        }
+    // ==========================================
+    // VARIABLES GLOBALES
+    // ==========================================
+    let quizData = [];
+    let currentIndex = 0;
+    let selectedIdx = null;
+    let timerInterval, autoNextTimer = null;
+    let timeLeft;
+    let studentProfile = { name: '', id: '' };
+    let studentScore = 0;
+    let esProfesor = false;
+    let quizCompletado = false;
+    let lastCorrectText = "";  // guarda la respuesta correcta actual
 
-        // ==========================================
-        // VARIABLES GLOBALES
-        // ==========================================
-        let quizData = [];
-        let currentIndex = 0;
-        let selectedIdx = null;
-        let timerInterval, autoNextTimer = null;
-        let timeLeft;
-        let studentProfile = { name: '', id: '' };
-        let studentScore = 0;
-        let esProfesor = true;
-        let quizCompletado = false;
-
-        // ==========================================
-        // FUNCIONES DEL EDITOR (PROFESOR)
-        // ==========================================
-        function addQuestion() {
-            const id = Date.now();
-            const html = `
-                <div class="q-card" id="q-${id}">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <strong style="color: var(--neon-blue)"># Módulo de Pregunta</strong>
-                        <button onclick="document.getElementById('q-${id}').remove()" style="background:none; color:var(--neon-pink); padding:0; font-size:12px;">[ ELIMINAR ]</button>
-                    </div>
-                    <input type="text" class="q-text" placeholder="Escribe el desafío aquí...">
-                    <input type="text" class="q-img" placeholder="URL de imagen (opcional)">
-                    <div class="options-area">
-                        <div class="option-edit-row">
-                            <input type="radio" name="correct-${id}" class="is-correct-check" checked>
-                            <input type="text" class="opt-text" placeholder="Opción Correcta">
-                        </div>
-                        <div class="option-edit-row">
-                            <input type="radio" name="correct-${id}" class="is-correct-check">
-                            <input type="text" class="opt-text" placeholder="Opción de Distracción">
-                        </div>
-                    </div>
-                    <button class="btn-blue" onclick="addOptionToQuestion('${id}')" style="margin-top:15px; font-size:11px; padding:8px 15px;">+ Añadir Opción</button>
-                </div>
-            `;
-            document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
-        }
-
-        function addOptionToQuestion(qId) {
-            const container = document.querySelector(`#q-${qId} .options-area`);
-            const html = `
-                <div class="option-edit-row">
-                    <input type="radio" name="correct-${qId}" class="is-correct-check">
-                    <input type="text" class="opt-text" placeholder="Opción adicional">
-                    <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', html);
-        }
-
-        function exportQuiz() {
-            const cards = document.querySelectorAll('#questions-container .q-card');
-            const data = Array.from(cards).map(card => {
-                const optionsRows = card.querySelectorAll('.option-edit-row');
-                const options = Array.from(optionsRows).map(row => ({
-                    text: row.querySelector('.opt-text').value,
-                    correct: row.querySelector('.is-correct-check').checked
-                })).filter(o => o.text.trim() !== "");
-                return { q: card.querySelector('.q-text').value, img: card.querySelector('.q-img').value, options };
-            }).filter(q => q.q.trim() !== "" && q.options.length > 0);
-
-            if (data.length === 0) return alert("❌ Error: No hay datos suficientes.");
-            const config = { time: document.getElementById('global-timer').value || 20, questions: data };
-            const jsonString = JSON.stringify(config);
-            const encoded = encodeBase64(jsonString);
-            const url = window.location.origin + window.location.pathname + '?quiz=' + encodeURIComponent(encoded);
-            
-            if (window.location.protocol === 'file:') {
-                alert('⚠️ ADVERTENCIA: Archivo local. Sube este HTML a un servidor para WhatsApp.');
-            }
-            
-            const modalHTML = `
-                <div id="url-modal" class="modal-overlay">
-                    <div class="modal-content">
-                        <h3 style="color:var(--neon-green); margin-top:0;">🔗 Enlace del Protocolo</h3>
-                        <p>Copia y comparte por WhatsApp:</p>
-                        <div style="background:#0a0b1e; border:1px solid var(--neon-blue); border-radius:12px; padding:15px; word-break:break-all; font-family:monospace; margin-bottom:20px;" id="url-text">${url}</div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="btn-green" style="flex:2;" onclick="window.copiarEnlaceModal()">📋 Copiar</button>
-                            <button class="btn-blue" style="flex:1;" onclick="window.open('${url}', '_blank')">🚀 Probar</button>
-                            <button class="btn-red" style="flex:1;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            const oldModal = document.getElementById('url-modal'); if (oldModal) oldModal.remove();
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            window.copiarEnlaceModal = () => {
-                const urlText = document.getElementById('url-text').innerText;
-                navigator.clipboard.writeText(urlText).then(() => alert('✅ Enlace copiado')).catch(() => {
-                    const ta = document.createElement('textarea'); ta.value = urlText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('✅ Copiado (alternativo)');
-                });
-            };
-        }
-
-        // ==========================================
-        // FUNCIONES DE ALMACENAMIENTO (LOCALSTORAGE + CORREO)
-        // ==========================================
-        function guardarLocalmente(registro) {
-            let registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            registros.push(registro);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
-        }
-
-        async function enviarResultadosPorCorreo(nombre, cedula, puntos, total) {
-            const datos = {
-                nombre: nombre,
-                cedula: cedula,
-                nota: puntos,
-                total_preguntas: total,
-                fecha: new Date().toLocaleString()
-            };
-
-            try {
-                const response = await fetch(FORMSPREE_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(datos)
-                });
-                if (response.ok) {
-                    console.log('✅ Correo enviado correctamente');
-                    return true;
-                } else {
-                    console.error('Error al enviar correo:', response.statusText);
-                    return false;
-                }
-            } catch (error) {
-                console.error('Error de conexión al enviar correo:', error);
-                return false;
-            }
-        }
-
-        async function guardarPuntaje(nombre, cedula, puntos, totalPreguntas) {
-            // 1. Guardar en localStorage SIEMPRE (para el panel de notas)
-            const registro = {
-                nombre, cedula, nota: puntos, total_preguntas: totalPreguntas,
-                fecha: new Date().toISOString()
-            };
-            guardarLocalmente(registro);
-
-            // 2. Enviar por correo (Formspree)
-            const correoEnviado = await enviarResultadosPorCorreo(nombre, cedula, puntos, totalPreguntas);
-            
-            if (!correoEnviado) {
-                console.warn('El correo no pudo enviarse, pero el resultado se guardó localmente.');
-            }
-            return true;
-        }
-
-        function obtenerRegistrosLocales() {
-            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        }
-
-        function borrarTodosLosRegistros() {
-            if (!confirm('⚠️ ¿Eliminar TODOS los registros locales?')) return;
-            localStorage.removeItem(STORAGE_KEY);
-            alert('✅ Registros locales eliminados');
-            abrirPanelNotas();
-        }
-
-        function borrarRegistroPorCedula(cedula) {
-            if (!confirm(`¿Eliminar registro con cédula ${cedula}?`)) return;
-            let registros = obtenerRegistrosLocales();
-            registros = registros.filter(r => r.cedula !== cedula);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
-            abrirPanelNotas();
-        }
-
-        async function abrirPanelNotas() {
-            if (!esProfesor || quizCompletado) {
-                alert('⛔ Acceso denegado.');
-                return;
-            }
-            document.getElementById('editor-view').classList.add('hidden');
-            document.getElementById('dashboard-view').classList.remove('hidden');
-            const tbody = document.getElementById('notas-body');
-            
-            const registros = obtenerRegistrosLocales();
-            if (registros.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Aún no hay registros locales.</td></tr>`;
-                return;
-            }
-            
-            // Ordenar por fecha descendente
-            registros.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-            tbody.innerHTML = '';
-            registros.forEach(fila => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${fila.nombre || ''}</td>
-                        <td>${fila.cedula || ''}</td>
-                        <td><strong style="color:var(--neon-green)">${fila.nota || 0} / ${fila.total_preguntas || '?'}</strong></td>
-                        <td><button class="btn-delete" onclick="borrarRegistroPorCedula('${fila.cedula}')">🗑️</button></td>
-                    </tr>
-                `;
-            });
-        }
-
-        function cerrarPanelNotas() {
-            document.getElementById('dashboard-view').classList.add('hidden');
+    // ==========================================
+    // AUTENTICACIÓN PROFESOR
+    // ==========================================
+    function verificarProfesor() {
+        const pwd = document.getElementById('teacher-password').value;
+        if (pwd === TEACHER_PASSWORD) {
+            document.getElementById('teacher-auth-view').classList.add('hidden');
             document.getElementById('editor-view').classList.remove('hidden');
-        }
-
-        // ==========================================
-        // FLUJO DEL ALUMNO
-        // ==========================================
-        function init() {
-            const params = new URLSearchParams(window.location.search);
-            if(params.has('quiz')) {
-                try {
-                    const encoded = params.get('quiz');
-                    const jsonString = decodeBase64(encoded);
-                    const decoded = JSON.parse(jsonString);
-                    quizData = decoded.questions;
-                    window.quizTime = parseInt(decoded.time);
-                    esProfesor = false;
-                    quizCompletado = false;
-                    document.getElementById('editor-view').classList.add('hidden');
-                    document.getElementById('login-view').classList.remove('hidden');
-                } catch(e) {
-                    alert("Error al cargar el quiz.");
-                    location.href = location.pathname;
-                }
-            } else {
-                esProfesor = true;
-                quizCompletado = false;
-                addQuestion();
+            esProfesor = true;
+            if (document.getElementById('questions-container').children.length === 0) {
+                addQuestion(); // primera pregunta
             }
+        } else {
+            document.getElementById('auth-error').style.display = 'block';
+            document.getElementById('teacher-password').value = '';
         }
+    }
 
-        function iniciarProtocoloAlumno() {
-            const nombre = document.getElementById('student-name').value.trim();
-            const cedula = document.getElementById('student-id').value.trim();
-            if(nombre === "" || cedula === "") {
-                alert("Completa tus datos.");
-                return;
-            }
-            studentProfile.name = nombre;
-            studentProfile.id = cedula;
-            studentScore = 0; 
-            document.getElementById('login-view').classList.add('hidden');
-            document.getElementById('quiz-view').classList.remove('hidden');
-            renderQuestion();
-        }
-
-        function renderQuestion() {
-            const q = quizData[currentIndex];
-            document.getElementById('display-q').innerText = q.q;
-            const displayImg = document.getElementById('display-img');
-            if(q.img && q.img.trim() !== "") {
-                displayImg.src = q.img;
-                displayImg.classList.remove('hidden');
-            } else {
-                displayImg.classList.add('hidden');
-            }
-            const optionsGrid = document.getElementById('display-options');
-            optionsGrid.innerHTML = '';
-            selectedIdx = null;
-            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
-            shuffledOptions.forEach((opt, index) => {
-                const btn = document.createElement('div');
-                btn.className = 'opt-btn';
-                btn.innerText = opt.text;
-                btn.onclick = () => {
-                    document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    selectedIdx = index;
-                    window.lastSelectedIsCorrect = opt.correct;
-                    window.lastCorrectText = q.options.find(o => o.correct).text;
-                };
-                optionsGrid.appendChild(btn);
-            });
-            startTimer();
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            timeLeft = window.quizTime;
-            const bar = document.getElementById('timer-fill');
-            bar.style.transition = 'none';
-            bar.style.width = '100%';
-            bar.style.backgroundColor = 'var(--neon-blue)';
-            setTimeout(() => {
-                bar.style.transition = `width ${timeLeft}s linear`;
-                bar.style.width = '0%';
-            }, 50);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                if(timeLeft <= 5) {
-                    bar.style.backgroundColor = 'var(--neon-pink)';
-                    bar.style.boxShadow = '0 0 15px var(--neon-pink)';
-                }
-                if(timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    handleTimeOut();
-                }
-            }, 1000);
-        }
-
-        function validateSelection() {
-            if(selectedIdx === null) return;
-            clearInterval(timerInterval);
-            if(window.lastSelectedIsCorrect) studentScore++;
-            showFeedback(window.lastSelectedIsCorrect);
-        }
-
-        function handleTimeOut() {
-            showFeedback(false, "SISTEMA: TIEMPO AGOTADO");
-        }
-
-        function showFeedback(isCorrect, customTitle) {
-            if (autoNextTimer) clearTimeout(autoNextTimer);
-            const bar = document.getElementById('feedback-bar');
-            const title = document.getElementById('fb-title');
-            const sub = document.getElementById('fb-sub');
-            const btn = document.getElementById('fb-btn');
-            bar.className = 'feedback-bar show ' + (isCorrect ? 'correct-bg' : 'wrong-bg');
-            title.innerText = customTitle || (isCorrect ? "¡Correctooo!" : "Error de Datos");
-            title.style.color = isCorrect ? "var(--neon-green)" : "var(--neon-pink)";
-            
-            if(!isCorrect) {
-                sub.innerText = `Dato esperado: ${window.lastCorrectText}`;
-                autoNextTimer = setTimeout(() => { nextQuestion(); }, 2000);
-                btn.innerText = "Siguiente (auto)";
-            } else {
-                sub.innerText = "Incrementando puntuación...";
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 }, colors: ['#39ff14', '#00f3ff', '#ff00e0'] });
-                btn.innerText = "Siguiente";
-            }
-            btn.className = isCorrect ? 'btn-green' : 'btn-red';
-        }
-
-        function nextQuestion() {
-            if (autoNextTimer) {
-                clearTimeout(autoNextTimer);
-                autoNextTimer = null;
-            }
-            document.getElementById('feedback-bar').classList.remove('show');
-            currentIndex++;
-            if(currentIndex < quizData.length) {
-                renderQuestion();
-            } else {
-                finalizarYCargarNotas();
-            }
-        }
-
-        async function finalizarYCargarNotas() {
-            const total = quizData.length;
-            quizCompletado = true;
-            document.getElementById('game-content').innerHTML = `<div style="text-align:center;"><h2 style="color:var(--neon-blue);">ENVIANDO RESULTADOS...</h2></div>`;
-            document.getElementById('main-check-btn').classList.add('hidden');
-            document.getElementById('timer-fill').parentElement.classList.add('hidden');
-            
-            let exito = false, errorMsg = '';
-            try {
-                await guardarPuntaje(studentProfile.name, studentProfile.id, studentScore, total);
-                exito = true;
-            } catch (e) { errorMsg = e.message; }
-            
-            document.getElementById('game-content').innerHTML = `
-                <div style="animation: fadeIn 1s ease;">
-                    <h1 style="color: var(--neon-green); font-size: 35px;">MISIÓN CUMPLIDA</h1>
-                    <p style="font-size: 20px;">Estudiante: <span style="color:var(--neon-blue)">${studentProfile.name}</span></p>
-                    <p style="font-size: 24px; font-weight: 700;">Nota: ${studentScore} / ${total}</p>
-                    <div style="padding: 10px; margin: 20px auto; max-width: 300px; border: 1px solid ${exito ? 'var(--neon-green)' : 'var(--neon-pink)'}; border-radius: 10px;">
-                        ${exito ? '✅ Resultados enviados por correo' : '❌ Error: ' + errorMsg}
+    // ==========================================
+    // FUNCIONES DEL EDITOR
+    // ==========================================
+    function addQuestion() {
+        const id = Date.now();
+        const html = `
+            <div class="q-card" id="q-${id}">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="color: var(--neon-blue)"># Módulo de Pregunta</strong>
+                    <button onclick="document.getElementById('q-${id}').remove()" style="background:none; color:var(--neon-pink); padding:0; font-size:12px;">[ ELIMINAR ]</button>
+                </div>
+                <input type="text" class="q-text" placeholder="Escribe el desafío aquí...">
+                <input type="text" class="q-img" placeholder="URL de imagen (opcional)">
+                <div class="options-area">
+                    <div class="option-edit-row">
+                        <input type="radio" name="correct-${id}" class="is-correct-check" checked>
+                        <input type="text" class="opt-text" placeholder="Opción Correcta">
                     </div>
-                    <div style="margin-top: 30px; padding: 20px; background: #0f1225; border-radius: 15px; border: 1px solid var(--neon-blue);">
-                        <h3 style="color: var(--neon-blue); margin: 0 0 10px;">🔒 Sesión finalizada</h3>
-                        <p style="font-size: 18px; margin: 0;">Ya puedes cerrar esta página de forma segura.</p>
+                    <div class="option-edit-row">
+                        <input type="radio" name="correct-${id}" class="is-correct-check">
+                        <input type="text" class="opt-text" placeholder="Opción de Distracción">
                     </div>
                 </div>
-            `;
-            esProfesor = false;
+                <button class="btn-blue" onclick="addOptionToQuestion('${id}')" style="margin-top:15px; font-size:11px; padding:8px 15px;">+ Añadir Opción</button>
+            </div>
+        `;
+        document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
+    }
+
+    function addOptionToQuestion(qId) {
+        const container = document.querySelector(`#q-${qId} .options-area`);
+        const html = `
+            <div class="option-edit-row">
+                <input type="radio" name="correct-${qId}" class="is-correct-check">
+                <input type="text" class="opt-text" placeholder="Opción adicional">
+                <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function exportQuiz() {
+        const cards = document.querySelectorAll('#questions-container .q-card');
+        const data = Array.from(cards).map(card => {
+            const optionsRows = card.querySelectorAll('.option-edit-row');
+            const options = Array.from(optionsRows).map(row => ({
+                text: row.querySelector('.opt-text').value,
+                correct: row.querySelector('.is-correct-check').checked
+            })).filter(o => o.text.trim() !== "");
+            return { q: card.querySelector('.q-text').value, img: card.querySelector('.q-img').value, options };
+        }).filter(q => q.q.trim() !== "" && q.options.length > 0);
+
+        if (data.length === 0) return alert("❌ Error: No hay datos suficientes.");
+        const config = { time: document.getElementById('global-timer').value || 20, questions: data };
+        const jsonString = JSON.stringify(config);
+        const encoded = encodeBase64(jsonString);
+        const url = window.location.origin + window.location.pathname + '?quiz=' + encodeURIComponent(encoded);
+
+        if (window.location.protocol === 'file:') {
+            alert('⚠️ Archivo local. Sube este HTML a un servidor para compartir.');
         }
 
-        window.addEventListener('popstate', function() {
-            if (!esProfesor && !quizCompletado) {
-                if (confirm('¿Abandonar el quiz? Perderás tu progreso.')) location.href = location.pathname;
-                else history.pushState(null, null, location.href);
-            }
-        });
+        const modalHTML = `
+            <div id="url-modal" class="modal-overlay">
+                <div class="modal-content">
+                    <h3 style="color:var(--neon-green); margin-top:0;">🔗 Enlace del Protocolo</h3>
+                    <p>Copia y comparte:</p>
+                    <div style="background:#0a0b1e; border:1px solid var(--neon-blue); border-radius:12px; padding:15px; word-break:break-all; font-family:monospace; margin-bottom:20px;" id="url-text">${url}</div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn-green" style="flex:2;" onclick="window.copiarEnlaceModal()">📋 Copiar</button>
+                        <button class="btn-blue" style="flex:1;" onclick="window.open('${url}', '_blank')">🚀 Probar</button>
+                        <button class="btn-red" style="flex:1;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        const oldModal = document.getElementById('url-modal'); if (oldModal) oldModal.remove();
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        window.copiarEnlaceModal = () => {
+            const urlText = document.getElementById('url-text').innerText;
+            navigator.clipboard.writeText(urlText).catch(() => {
+                const ta = document.createElement('textarea'); ta.value = urlText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+            });
+            alert('✅ Enlace copiado al portapapeles');
+        };
+    }
 
-        window.onload = init;
-    </script>
+    // ==========================================
+    // ALMACENAMIENTO LOCAL Y CORREO
+    // ==========================================
+    function guardarLocalmente(registro) {
+        let registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        registros.push(registro);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
+    }
+
+    async function enviarResultadosPorCorreo(nombre, cedula, puntos, total) {
+        const datos = {
+            nombre, cedula, nota: puntos, total_preguntas: total,
+            fecha: new Date().toLocaleString()
+        };
+        try {
+            const response = await fetch(FORMSPREE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async function guardarPuntaje(nombre, cedula, puntos, totalPreguntas) {
+        guardarLocalmente({ nombre, cedula, nota: puntos, total_preguntas: totalPreguntas, fecha: new Date().toISOString() });
+        await enviarResultadosPorCorreo(nombre, cedula, puntos, totalPreguntas);
+        return true;
+    }
+
+    function obtenerRegistrosLocales() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    }
+
+    function borrarTodosLosRegistros() {
+        if (!confirm('⚠️ ¿Eliminar TODOS los registros locales?')) return;
+        localStorage.removeItem(STORAGE_KEY);
+        alert('✅ Registros locales eliminados');
+        abrirPanelNotas();
+    }
+
+    function borrarRegistroPorCedula(cedula) {
+        if (!confirm(`¿Eliminar registro con cédula ${cedula}?`)) return;
+        let registros = obtenerRegistrosLocales();
+        registros = registros.filter(r => r.cedula !== cedula);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
+        abrirPanelNotas();
+    }
+
+    async function abrirPanelNotas() {
+        document.getElementById('editor-view').classList.add('hidden');
+        document.getElementById('dashboard-view').classList.remove('hidden');
+        const tbody = document.getElementById('notas-body');
+        const registros = obtenerRegistrosLocales();
+        if (registros.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Aún no hay registros locales.</td></tr>`;
+            return;
+        }
+        registros.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        tbody.innerHTML = '';
+        registros.forEach(fila => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${fila.nombre || ''}</td>
+                    <td>${fila.cedula || ''}</td>
+                    <td><strong style="color:var(--neon-green)">${fila.nota || 0} / ${fila.total_preguntas || '?'}</strong></td>
+                    <td><button class="btn-delete" onclick="borrarRegistroPorCedula('${fila.cedula}')">🗑️</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function cerrarPanelNotas() {
+        document.getElementById('dashboard-view').classList.add('hidden');
+        document.getElementById('editor-view').classList.remove('hidden');
+    }
+
+    // ==========================================
+    // FLUJO DEL ALUMNO
+    // ==========================================
+    function init() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('quiz')) {
+            // Modo estudiante: debe cargar el quiz
+            try {
+                const encoded = params.get('quiz');
+                const jsonString = decodeBase64(encoded);
+                if (!jsonString) throw new Error("Enlace corrupto");
+                const decoded = JSON.parse(jsonString);
+                quizData = decoded.questions;
+                window.quizTime = parseInt(decoded.time);
+                esProfesor = false;
+                quizCompletado = false;
+                document.getElementById('login-view').classList.remove('hidden');
+                // Ocultar editor y autenticación
+                document.getElementById('teacher-auth-view').classList.add('hidden');
+                document.getElementById('editor-view').classList.add('hidden');
+            } catch (e) {
+                alert("❌ Error al cargar el quiz. El enlace puede estar dañado o ser incompatible.");
+                location.href = location.pathname;
+            }
+        } else {
+            // Sin parámetro quiz: pedir contraseña al profesor
+            document.getElementById('teacher-auth-view').classList.remove('hidden');
+            document.getElementById('editor-view').classList.add('hidden');
+            document.getElementById('login-view').classList.add('hidden');
+            esProfesor = false; // aún no autenticado
+        }
+    }
+
+    function iniciarProtocoloAlumno() {
+        const nombre = document.getElementById('student-name').value.trim();
+        const cedula = document.getElementById('student-id').value.trim();
+        if (nombre === "" || cedula === "") {
+            alert("Completa tus datos.");
+            return;
+        }
+        studentProfile.name = nombre;
+        studentProfile.id = cedula;
+        studentScore = 0;
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('quiz-view').classList.remove('hidden');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = quizData[currentIndex];
+        // Guardar texto de la respuesta correcta
+        lastCorrectText = q.options.find(o => o.correct).text || "Sin definir";
+        document.getElementById('display-q').innerText = q.q;
+        const displayImg = document.getElementById('display-img');
+        if (q.img && q.img.trim() !== "") {
+            displayImg.src = q.img;
+            displayImg.classList.remove('hidden');
+        } else {
+            displayImg.classList.add('hidden');
+        }
+        const optionsGrid = document.getElementById('display-options');
+        optionsGrid.innerHTML = '';
+        selectedIdx = null;
+        const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+        shuffledOptions.forEach((opt, index) => {
+            const btn = document.createElement('div');
+            btn.className = 'opt-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => {
+                document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedIdx = index;
+                // guardamos si es correcta para la validación manual
+                window.selectedCorrect = opt.correct;
+            };
+            optionsGrid.appendChild(btn);
+        });
+        window.selectedCorrect = false; // reset
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = window.quizTime;
+        const bar = document.getElementById('timer-fill');
+        bar.style.transition = 'none';
+        bar.style.width = '100%';
+        bar.style.backgroundColor = 'var(--neon-blue)';
+        setTimeout(() => {
+            bar.style.transition = `width ${timeLeft}s linear`;
+            bar.style.width = '0%';
+        }, 50);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 5) {
+                bar.style.backgroundColor = 'var(--neon-pink)';
+                bar.style.boxShadow = '0 0 15px var(--neon-pink)';
+            }
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                handleTimeOut();
+            }
+        }, 1000);
+    }
+
+    function validateSelection() {
+        if (selectedIdx === null) return;
+        clearInterval(timerInterval);
+        if (window.selectedCorrect) studentScore++;
+        showFeedback(window.selectedCorrect);
+    }
+
+    function handleTimeOut() {
+        // Sin selección, mostramos la respuesta correcta
+        showFeedback(false, "Se acabó el tiempo");
+    }
+
+    function showFeedback(isCorrect, customTitle) {
+        if (autoNextTimer) clearTimeout(autoNextTimer);
+        const bar = document.getElementById('feedback-bar');
+        const title = document.getElementById('fb-title');
+        const sub = document.getElementById('fb-sub');
+        const btn = document.getElementById('fb-btn');
+        bar.className = 'feedback-bar show ' + (isCorrect ? 'correct-bg' : 'wrong-bg');
+        title.innerText = customTitle || (isCorrect ? "¡Correctooo!" : "Error de Datos");
+        title.style.color = isCorrect ? "var(--neon-green)" : "var(--neon-pink)";
+
+        if (!isCorrect) {
+            sub.innerText = `Respuesta correcta: ${lastCorrectText}`;
+            autoNextTimer = setTimeout(() => { nextQuestion(); }, 3000);
+            btn.innerText = "Siguiente (auto)";
+        } else {
+            sub.innerText = "Puntuación incrementada";
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 }, colors: ['#39ff14', '#00f3ff', '#ff00e0'] });
+            btn.innerText = "Siguiente";
+        }
+        btn.className = isCorrect ? 'btn-green' : 'btn-red';
+    }
+
+    function nextQuestion() {
+        if (autoNextTimer) {
+            clearTimeout(autoNextTimer);
+            autoNextTimer = null;
+        }
+        document.getElementById('feedback-bar').classList.remove('show');
+        currentIndex++;
+        if (currentIndex < quizData.length) {
+            renderQuestion();
+        } else {
+            finalizarYCargarNotas();
+        }
+    }
+
+    async function finalizarYCargarNotas() {
+        const total = quizData.length;
+        quizCompletado = true;
+        document.getElementById('game-content').innerHTML = `<div style="text-align:center;"><h2 style="color:var(--neon-blue);">ENVIANDO RESULTADOS...</h2></div>`;
+        document.getElementById('main-check-btn').classList.add('hidden');
+        document.getElementById('timer-fill').parentElement.classList.add('hidden');
+
+        let exito = true, errorMsg = '';
+        try {
+            await guardarPuntaje(studentProfile.name, studentProfile.id, studentScore, total);
+        } catch (e) {
+            exito = false;
+            errorMsg = e.message;
+        }
+
+        document.getElementById('game-content').innerHTML = `
+            <div style="animation: fadeIn 1s ease;">
+                <h1 style="color: var(--neon-green); font-size: 35px;">MISIÓN CUMPLIDA</h1>
+                <p style="font-size: 20px;">Estudiante: <span style="color:var(--neon-blue)">${studentProfile.name}</span></p>
+                <p style="font-size: 24px; font-weight: 700;">Nota: ${studentScore} / ${total}</p>
+                <div style="padding: 10px; margin: 20px auto; max-width: 300px; border: 1px solid ${exito ? 'var(--neon-green)' : 'var(--neon-pink)'}; border-radius: 10px;">
+                    ${exito ? '✅ Resultados enviados' : '❌ Error: ' + errorMsg}
+                </div>
+                <div style="margin-top: 30px; padding: 20px; background: #0f1225; border-radius: 15px; border: 1px solid var(--neon-blue);">
+                    <h3 style="color: var(--neon-blue); margin: 0 0 10px;">🔒 Sesión finalizada</h3>
+                    <p style="font-size: 18px; margin: 0;">Ya puedes cerrar esta página de forma segura.</p>
+                </div>
+            </div>
+        `;
+        esProfesor = false;
+    }
+
+    // Prevenir que el alumno vuelva atrás o acceda al editor
+    window.addEventListener('popstate', function() {
+        if (!esProfesor && !quizCompletado) {
+            if (confirm('¿Abandonar el quiz? Perderás tu progreso.')) {
+                location.href = location.pathname;
+            } else {
+                history.pushState(null, null, location.href);
+            }
+        }
+    });
+
+    window.onload = init;
+</script>
 </body>
 </html>
