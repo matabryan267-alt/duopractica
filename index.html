@@ -23,118 +23,60 @@
             background-color: var(--bg-dark);
             color: var(--text-light);
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             background-image: radial-gradient(circle at 50% 50%, #1a1f4d 0%, #0a0b1e 100%);
         }
-        .header {
-            width: 100%;
-            background: rgba(22, 27, 51, 0.9);
-            padding: 20px 0;
-            border-bottom: 2px solid var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue-dark);
-            text-align: center;
-            margin-bottom: 30px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-        }
-        h1, h2, h3, .logo { font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
-        .logo { margin:0; color: var(--neon-green); font-size: 28px; text-shadow: 0 0 10px var(--neon-green-dark); }
-        .container { width: 90%; max-width: 700px; padding-bottom: 150px; }
-        .hidden { display: none !important; }
-        button {
-            cursor: pointer; border: none; border-radius: 12px; font-weight: 800;
-            font-family: 'Orbitron', sans-serif; text-transform: uppercase;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 14px; padding: 14px 24px; -webkit-appearance: none;
-        }
-        button:active { transform: scale(0.95); }
-        .btn-green { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green-dark); }
-        .btn-green:hover { box-shadow: 0 0 25px var(--neon-green); }
-        .btn-blue { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue-dark); }
-        .btn-blue:hover { box-shadow: 0 0 25px var(--neon-blue); }
-        .btn-red { background: var(--neon-pink); color: #fff; box-shadow: 0 0 15px var(--neon-pink-dark); }
-        .btn-purple { background: #9d00ff; color: #fff; box-shadow: 0 0 15px #6a00a8; }
-        .btn-purple:hover { box-shadow: 0 0 25px #9d00ff; }
+        .header { width:100%; background: rgba(22,27,51,0.9); padding:20px 0; border-bottom:2px solid var(--neon-blue); box-shadow:0 0 15px var(--neon-blue-dark); text-align:center; margin-bottom:30px; position:sticky; top:0; z-index:1000; backdrop-filter: blur(10px); }
+        h1,h2,h3,.logo { font-family:'Orbitron',sans-serif; text-transform:uppercase; letter-spacing:2px; }
+        .logo { margin:0; color:var(--neon-green); font-size:28px; text-shadow:0 0 10px var(--neon-green-dark); }
+        .container { width:90%; max-width:700px; padding-bottom:150px; }
+        .hidden { display:none !important; }
+        button { cursor:pointer; border:none; border-radius:12px; font-weight:800; font-family:'Orbitron',sans-serif; text-transform:uppercase; transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); font-size:14px; padding:14px 24px; -webkit-appearance:none; }
+        button:active { transform:scale(0.95); }
+        .btn-green { background:var(--neon-green); color:#000; box-shadow:0 0 15px var(--neon-green-dark); }
+        .btn-green:hover { box-shadow:0 0 25px var(--neon-green); }
+        .btn-blue { background:var(--neon-blue); color:#000; box-shadow:0 0 15px var(--neon-blue-dark); }
+        .btn-blue:hover { box-shadow:0 0 25px var(--neon-blue); }
+        .btn-red { background:var(--neon-pink); color:#fff; box-shadow:0 0 15px var(--neon-pink-dark); }
+        .btn-purple { background:#9d00ff; color:#fff; box-shadow:0 0 15px #6a00a8; }
+        .btn-purple:hover { box-shadow:0 0 25px #9d00ff; }
         .btn-telegram { background:#0088cc; color:#fff; box-shadow:0 0 15px #0077b5; }
         .btn-telegram:hover { box-shadow:0 0 25px #00a3e0; }
-        .q-card {
-            background: var(--card-bg); border: 2px solid #2d345e; border-radius: 20px;
-            padding: 25px; margin-bottom: 25px; animation: fadeIn 0.5s ease-out;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        input {
-            width: 100%; padding: 14px; margin: 10px 0; background: #0f1225;
-            border: 2px solid #2d345e; border-radius: 14px; font-family: inherit;
-            color: white; box-sizing: border-box; font-size: 16px; transition: 0.3s;
-            -webkit-appearance: none;
-        }
-        input:focus { border-color: var(--neon-blue); outline: none; box-shadow: 0 0 10px var(--neon-blue-dark); }
-        .option-edit-row { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
-        .is-correct-check { width: 30px !important; height: 30px; cursor: pointer; accent-color: var(--neon-green); }
-        .progress-container { width: 100%; height: 14px; background: #1a1f4d; border-radius: 20px; margin: 25px 0; overflow: hidden; border: 1px solid var(--neon-blue-dark); }
-        #timer-fill { height: 100%; background: var(--neon-blue); width: 100%; box-shadow: 0 0 15px var(--neon-blue); transition: width 1s linear; }
-        .quiz-img { max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 18px; margin-bottom: 20px; background: #000; border: 2px solid var(--neon-blue); box-shadow: 0 0 15px rgba(0, 243, 255, 0.3); }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .opt-btn {
-            border: 2px solid #2d345e; background: var(--card-bg); color: var(--text-light);
-            border-radius: 18px; padding: 22px; font-size: 18px; text-align: center;
-            font-weight: 700; transition: all 0.2s; cursor: pointer; -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-        .opt-btn:hover { border-color: var(--neon-blue); background: #1e2548; }
-        .opt-btn.selected {
-            border-color: var(--neon-blue); background: #00f3ff22; color: var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), inset 0 0 10px rgba(0, 243, 255, 0.2);
-        }
-        .feedback-bar {
-            position: fixed; bottom: 0; left: 0; right: 0; padding: 35px; transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            display: flex; justify-content: center; z-index: 2000; backdrop-filter: blur(15px);
-        }
-        .feedback-bar.show { transform: translateY(0); }
-        .correct-bg { background-color: rgba(57, 255, 20, 0.15); border-top: 3px solid var(--neon-green); }
-        .wrong-bg { background-color: rgba(255, 0, 224, 0.15); border-top: 3px solid var(--neon-pink); }
-        .feedback-content { width: 100%; max-width: 700px; display: flex; justify-content: space-between; align-items: center; }
-        .feedback-text h2 { margin: 0; font-size: 26px; font-family: 'Orbitron'; }
-        .feedback-text p { margin: 8px 0 0; font-weight: 700; color: #fff; }
-        .notas-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0f1225; border-radius: 10px; overflow: hidden; }
-        .notas-table th, .notas-table td { padding: 15px; border-bottom: 1px solid #2d345e; text-align: left; }
-        .notas-table th { background: #1a1f4d; color: var(--neon-blue); font-family: 'Orbitron'; }
-        .notas-table tr:hover { background: #161b33; }
-        .btn-delete {
-            background: #ff3333;
-            color: white;
-            padding: 5px 12px;
-            font-size: 12px;
-            border-radius: 8px;
-            box-shadow: 0 0 8px #ff0000;
-        }
-        .btn-delete:hover {
-            background: #ff0000;
-            box-shadow: 0 0 15px #ff0000;
-        }
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(10,11,30,0.95); z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px);
-        }
-        .modal-content {
-            background: #161b33; border: 2px solid var(--neon-blue);
-            border-radius: 20px; padding: 30px; max-width: 600px; width: 90%;
-            box-shadow: 0 0 40px var(--neon-blue-dark);
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } .feedback-content { flex-direction: column; text-align: center; gap: 15px; } }
+        .btn-orange { background:#ff8c00; color:#000; box-shadow:0 0 15px #cc7000; }
+        .btn-orange:hover { box-shadow:0 0 25px #ff8c00; }
+        .q-card { background:var(--card-bg); border:2px solid #2d345e; border-radius:20px; padding:25px; margin-bottom:25px; animation:fadeIn 0.5s ease-out; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+        input { width:100%; padding:14px; margin:10px 0; background:#0f1225; border:2px solid #2d345e; border-radius:14px; font-family:inherit; color:white; box-sizing:border-box; font-size:16px; transition:0.3s; -webkit-appearance:none; }
+        input:focus { border-color:var(--neon-blue); outline:none; box-shadow:0 0 10px var(--neon-blue-dark); }
+        .option-edit-row { display:flex; gap:12px; align-items:center; margin-bottom:8px; }
+        .is-correct-check { width:30px !important; height:30px; cursor:pointer; accent-color:var(--neon-green); margin:0; }
+        .progress-container { width:100%; height:14px; background:#1a1f4d; border-radius:20px; margin:25px 0; overflow:hidden; border:1px solid var(--neon-blue-dark); }
+        #timer-fill { height:100%; background:var(--neon-blue); width:100%; box-shadow:0 0 15px var(--neon-blue); transition:width 1s linear; }
+        .quiz-img { max-width:100%; max-height:250px; object-fit:contain; border-radius:18px; margin-bottom:20px; background:#000; border:2px solid var(--neon-blue); box-shadow:0 0 15px rgba(0,243,255,0.3); }
+        .options-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+        .opt-btn { border:2px solid #2d345e; background:var(--card-bg); color:var(--text-light); border-radius:18px; padding:22px; font-size:18px; text-align:center; font-weight:700; transition:all 0.2s; cursor:pointer; -webkit-tap-highlight-color:transparent; user-select:none; }
+        .opt-btn:hover { border-color:var(--neon-blue); background:#1e2548; }
+        .opt-btn.selected { border-color:var(--neon-blue); background:#00f3ff22; color:var(--neon-blue); box-shadow:0 0 20px rgba(0,243,255,0.4), inset 0 0 10px rgba(0,243,255,0.2); }
+        .feedback-bar { position:fixed; bottom:0; left:0; right:0; padding:35px; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.18,0.89,0.32,1.28); display:flex; justify-content:center; z-index:2000; backdrop-filter:blur(15px); }
+        .feedback-bar.show { transform:translateY(0); }
+        .correct-bg { background-color:rgba(57,255,20,0.15); border-top:3px solid var(--neon-green); }
+        .wrong-bg { background-color:rgba(255,0,224,0.15); border-top:3px solid var(--neon-pink); }
+        .feedback-content { width:100%; max-width:700px; display:flex; justify-content:space-between; align-items:center; }
+        .feedback-text h2 { margin:0; font-size:26px; font-family:'Orbitron'; }
+        .feedback-text p { margin:8px 0 0; font-weight:700; color:#fff; }
+        .notas-table { width:100%; border-collapse:collapse; margin-top:20px; background:#0f1225; border-radius:10px; overflow:hidden; }
+        .notas-table th,.notas-table td { padding:15px; border-bottom:1px solid #2d345e; text-align:left; }
+        .notas-table th { background:#1a1f4d; color:var(--neon-blue); font-family:'Orbitron'; }
+        .notas-table tr:hover { background:#161b33; }
+        .btn-delete { background:#ff3333; color:white; padding:5px 12px; font-size:12px; border-radius:8px; box-shadow:0 0 8px #ff0000; }
+        .btn-delete:hover { background:#ff0000; box-shadow:0 0 15px #ff0000; }
+        .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(10,11,30,0.95); z-index:9999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px); }
+        .modal-content { background:#161b33; border:2px solid var(--neon-blue); border-radius:20px; padding:30px; max-width:600px; width:90%; box-shadow:0 0 40px var(--neon-blue-dark); }
+        textarea { width:100%; height:200px; background:#0f1225; border:2px solid #2d345e; border-radius:14px; color:white; padding:15px; font-family:inherit; font-size:16px; box-sizing:border-box; resize:vertical; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @media (max-width:600px) { .options-grid { grid-template-columns:1fr; } .feedback-content { flex-direction:column; text-align:center; gap:15px; } }
     </style>
 </head>
 <body>
-
 <div class="header">
     <div class="logo">DuoQuiz <span style="color: var(--neon-blue)">PRO</span></div>
 </div>
@@ -165,12 +107,27 @@
             <button class="btn-telegram" style="flex:1;" onclick="guardarConfigTelegram()">💾 Guardar Configuración</button>
             <button class="btn-blue" style="flex:1;" onclick="probarTelegram()">🧪 Probar Telegram</button>
         </div>
-        <p style="font-size:12px; color:#aaa; margin-top:10px;">Crea un bot en <a href="https://t.me/BotFather" target="_blank" style="color:var(--neon-blue)">@BotFather</a> y obtén tu Chat ID.</p>
     </div>
     <div id="questions-container"></div>
-    <div style="display: flex; gap: 15px; margin-top: 25px;">
+    <div style="display: flex; gap: 15px; margin-top: 25px; flex-wrap: wrap;">
         <button class="btn-blue" onclick="addQuestion()">+ Nueva Pregunta</button>
+        <button class="btn-orange" onclick="abrirImportador()">📥 Importar Quiz</button>
         <button class="btn-green" style="flex-grow: 1;" onclick="exportQuiz()">🚀 Desplegar Protocolo</button>
+    </div>
+</div>
+
+<!-- MODAL DE IMPORTACIÓN -->
+<div id="import-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <h3 style="color:var(--neon-orange); margin-top:0;">📥 Importar Quiz desde texto</h3>
+        <p style="font-size:14px; color:#aaa;">Pega el contenido con el formato:<br>
+        <code>Pregunta (una línea)<br>*Opción correcta<br>Opción incorrecta</code><br>
+        Separa cada pregunta con una línea en blanco.</p>
+        <textarea id="import-text" placeholder="¿Capital de Francia?&#10;*París&#10;Londres&#10;Madrid&#10;&#10;¿2+2?&#10;*4&#10;3&#10;5"></textarea>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn-green" style="flex:2;" onclick="importarQuiz()">✅ Importar y reemplazar</button>
+            <button class="btn-red" style="flex:1;" onclick="document.getElementById('import-modal').classList.add('hidden')">Cancelar</button>
+        </div>
     </div>
 </div>
 
@@ -225,11 +182,13 @@
 
 <script>
     // ==========================================
-    // CONFIGURACIÓN
+    // CONFIGURACIÓN FIJA (token e ID de Telegram)
     // ==========================================
+    const DEFAULT_TELEGRAM_TOKEN = '8776895277:AAEu6w2UAU-aBB-IMrmm_zo0J8jzk2Kicis';
+    const DEFAULT_TELEGRAM_CHATID = '6815312132';
     const STORAGE_KEY = 'duoquiz_resultados';
-    const TELEGRAM_CONFIG_KEY = 'duoquiz_telegram'; // { token, chatid }
-    const TEACHER_PASSWORD = 'profe123'; // Cámbiala si quieres
+    const TELEGRAM_CONFIG_KEY = 'duoquiz_telegram';
+    const TEACHER_PASSWORD = 'profe123';
 
     // ==========================================
     // CODIFICACIÓN COMPATIBLE (iOS safe)
@@ -271,14 +230,14 @@
     let lastCorrectText = "";
 
     // ==========================================
-    // GESTIÓN DE CONFIGURACIÓN TELEGRAM
+    // GESTIÓN DE CONFIGURACIÓN TELEGRAM (con valores por defecto)
     // ==========================================
     function obtenerConfigTelegram() {
         const saved = localStorage.getItem(TELEGRAM_CONFIG_KEY);
         if (saved) {
-            try { return JSON.parse(saved); } catch(e) { return {token:'', chatid:''}; }
+            try { return JSON.parse(saved); } catch(e) {}
         }
-        return { token: '', chatid: '' };
+        return { token: DEFAULT_TELEGRAM_TOKEN, chatid: DEFAULT_TELEGRAM_CHATID };
     }
 
     function guardarConfigTelegram() {
@@ -312,8 +271,8 @@
 
     function cargarConfigTelegramEnForm() {
         const { token, chatid } = obtenerConfigTelegram();
-        if (token) document.getElementById('tg-token').value = token;
-        if (chatid) document.getElementById('tg-chatid').value = chatid;
+        document.getElementById('tg-token').value = token;
+        document.getElementById('tg-chatid').value = chatid;
     }
 
     // ==========================================
@@ -350,12 +309,14 @@
                 <input type="text" class="q-img" placeholder="URL de imagen (opcional)">
                 <div class="options-area">
                     <div class="option-edit-row">
-                        <input type="radio" name="correct-${id}" class="is-correct-check" checked>
+                        <input type="checkbox" class="is-correct-check" checked onclick="exclusiveCheck(this)">
                         <input type="text" class="opt-text" placeholder="Opción Correcta">
+                        <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
                     </div>
                     <div class="option-edit-row">
-                        <input type="radio" name="correct-${id}" class="is-correct-check">
+                        <input type="checkbox" class="is-correct-check" onclick="exclusiveCheck(this)">
                         <input type="text" class="opt-text" placeholder="Opción de Distracción">
+                        <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
                     </div>
                 </div>
                 <button class="btn-blue" onclick="addOptionToQuestion('${id}')" style="margin-top:15px; font-size:11px; padding:8px 15px;">+ Añadir Opción</button>
@@ -364,16 +325,98 @@
         document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
     }
 
+    // Exclusividad de checkboxes: solo uno marcado por grupo
+    function exclusiveCheck(chk) {
+        if (!chk.checked) return;
+        const row = chk.closest('.option-edit-row');
+        const container = row.parentElement;
+        container.querySelectorAll('.is-correct-check').forEach(cb => {
+            if (cb !== chk) cb.checked = false;
+        });
+    }
+
     function addOptionToQuestion(qId) {
         const container = document.querySelector(`#q-${qId} .options-area`);
         const html = `
             <div class="option-edit-row">
-                <input type="radio" name="correct-${qId}" class="is-correct-check">
+                <input type="checkbox" class="is-correct-check" onclick="exclusiveCheck(this)">
                 <input type="text" class="opt-text" placeholder="Opción adicional">
                 <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
             </div>
         `;
         container.insertAdjacentHTML('beforeend', html);
+    }
+
+    // ==========================================
+    // IMPORTADOR DE QUIZ DESDE TEXTO
+    // ==========================================
+    function abrirImportador() {
+        document.getElementById('import-modal').classList.remove('hidden');
+    }
+
+    function importarQuiz() {
+        const texto = document.getElementById('import-text').value.trim();
+        if (!texto) {
+            alert('Pega el texto del quiz.');
+            return;
+        }
+        // Separar por bloques (línea en blanco)
+        const bloques = texto.split(/\n\s*\n/).filter(b => b.trim() !== '');
+        if (bloques.length === 0) {
+            alert('No se encontraron preguntas.');
+            return;
+        }
+
+        // Limpiar preguntas existentes
+        document.getElementById('questions-container').innerHTML = '';
+
+        bloques.forEach(bloque => {
+            const lineas = bloque.split('\n').map(l => l.trim()).filter(l => l !== '');
+            if (lineas.length < 2) return; // necesita al menos pregunta y una opción
+            const pregunta = lineas[0];
+            const opciones = lineas.slice(1).map(linea => {
+                const esCorrecta = linea.startsWith('*');
+                const textoOpcion = esCorrecta ? linea.substring(1).trim() : linea.trim();
+                return { text: textoOpcion, correct: esCorrecta };
+            });
+
+            if (opciones.length === 0) return;
+            // Si ninguna está marcada como correcta, la primera será la correcta
+            if (!opciones.some(o => o.correct)) {
+                opciones[0].correct = true;
+            }
+
+            crearPreguntaConDatos(pregunta, '', opciones);
+        });
+
+        document.getElementById('import-modal').classList.add('hidden');
+        document.getElementById('import-text').value = '';
+        alert('✅ Quiz importado correctamente.');
+    }
+
+    function crearPreguntaConDatos(enunciado, img, opciones) {
+        const id = Date.now() + Math.random();
+        const opcionesHTML = opciones.map((op, i) => `
+            <div class="option-edit-row">
+                <input type="checkbox" class="is-correct-check" ${op.correct ? 'checked' : ''} onclick="exclusiveCheck(this)">
+                <input type="text" class="opt-text" value="${op.text.replace(/"/g, '&quot;')}" placeholder="Opción">
+                <button onclick="this.parentElement.remove()" style="background:none; color:var(--neon-pink); font-size:20px;">×</button>
+            </div>
+        `).join('');
+
+        const html = `
+            <div class="q-card" id="q-${id}">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="color: var(--neon-blue)"># Módulo de Pregunta</strong>
+                    <button onclick="document.getElementById('q-${id}').remove()" style="background:none; color:var(--neon-pink); padding:0; font-size:12px;">[ ELIMINAR ]</button>
+                </div>
+                <input type="text" class="q-text" value="${enunciado.replace(/"/g, '&quot;')}">
+                <input type="text" class="q-img" value="${img.replace(/"/g, '&quot;')}" placeholder="URL de imagen (opcional)">
+                <div class="options-area">${opcionesHTML}</div>
+                <button class="btn-blue" onclick="addOptionToQuestion('${id}')" style="margin-top:15px; font-size:11px; padding:8px 15px;">+ Añadir Opción</button>
+            </div>
+        `;
+        document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
     }
 
     function exportQuiz() {
@@ -427,7 +470,7 @@
     async function enviarResultadosTelegram(nombre, cedula, puntos, total) {
         const { token, chatid } = obtenerConfigTelegram();
         if (!token || !chatid) {
-            console.warn('Telegram no configurado, resultado no enviado.');
+            console.warn('Telegram no configurado.');
             return false;
         }
         const mensaje = `📋 *Resultado de Quiz*%0A👤 Nombre: ${nombre}%0A🆔 Cédula: ${cedula}%0A✅ Nota: ${puntos} / ${total}%0A📅 Fecha: ${new Date().toLocaleString()}`;
@@ -535,7 +578,6 @@
 
     function renderQuestion() {
         const q = quizData[currentIndex];
-        // Aplicar capitalización al enunciado y a las opciones
         const enunciado = capitalizarFrase(q.q);
         lastCorrectText = capitalizarFrase(q.options.find(o => o.correct).text || "Sin definir");
         document.getElementById('game-content').innerHTML = `
