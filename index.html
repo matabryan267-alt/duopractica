@@ -60,6 +60,8 @@
         .btn-red { background: var(--neon-pink); color: #fff; box-shadow: 0 0 15px var(--neon-pink-dark); }
         .btn-purple { background: #9d00ff; color: #fff; box-shadow: 0 0 15px #6a00a8; }
         .btn-purple:hover { box-shadow: 0 0 25px #9d00ff; }
+        .btn-telegram { background:#0088cc; color:#fff; box-shadow:0 0 15px #0077b5; }
+        .btn-telegram:hover { box-shadow:0 0 25px #00a3e0; }
         .q-card {
             background: var(--card-bg); border: 2px solid #2d345e; border-radius: 20px;
             padding: 25px; margin-bottom: 25px; animation: fadeIn 0.5s ease-out;
@@ -137,8 +139,8 @@
     <div class="logo">DuoQuiz <span style="color: var(--neon-blue)">PRO</span></div>
 </div>
 
-<!-- AUTENTICACIÓN DEL PROFESOR (si no hay quiz) -->
-<div id="teacher-auth-view" class="container hidden">
+<!-- AUTENTICACIÓN DEL PROFESOR -->
+<div id="teacher-auth-view" class="container">
     <div class="q-card" style="border-color: var(--neon-pink); text-align: center;">
         <h2 style="color: var(--neon-pink)">🔐 ACCESO PROFESOR</h2>
         <p>Introduce la contraseña para crear o revisar exámenes.</p>
@@ -155,6 +157,15 @@
         <h3 style="margin-top:0; color: var(--neon-blue)">⚡ Ajustes de Sistema</h3>
         <label style="font-weight: 700;">Segundos por pulso:</label>
         <input type="number" id="global-timer" value="20">
+        <label style="font-weight:700; margin-top:15px;">🤖 Token del Bot de Telegram:</label>
+        <input type="text" id="tg-token" placeholder="123456:ABCdef...">
+        <label style="font-weight:700;">🆔 ID de Chat de Telegram:</label>
+        <input type="text" id="tg-chatid" placeholder="123456789">
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn-telegram" style="flex:1;" onclick="guardarConfigTelegram()">💾 Guardar Configuración</button>
+            <button class="btn-blue" style="flex:1;" onclick="probarTelegram()">🧪 Probar Telegram</button>
+        </div>
+        <p style="font-size:12px; color:#aaa; margin-top:10px;">Crea un bot en <a href="https://t.me/BotFather" target="_blank" style="color:var(--neon-blue)">@BotFather</a> y obtén tu Chat ID.</p>
     </div>
     <div id="questions-container"></div>
     <div style="display: flex; gap: 15px; margin-top: 25px;">
@@ -172,15 +183,11 @@
         </div>
         <div style="overflow-x: auto;">
             <table class="notas-table" id="tabla-resultados">
-                <thead>
-                <tr><th>Nombre</th><th>Cédula</th><th>Puntuación</th><th>Acciones</th></tr>
-                </thead>
-                <tbody id="notas-body">
-                <tr><td colspan="4" style="text-align: center;">Cargando registros...</td></tr>
-                </tbody>
+                <thead><tr><th>Nombre</th><th>Cédula</th><th>Puntuación</th><th>Acciones</th></tr></thead>
+                <tbody id="notas-body"></tbody>
             </table>
         </div>
-        <p style="font-size:14px; margin-top:15px; color:#aaa;">📧 Los resultados también se envían a tu correo (Formspree).</p>
+        <p style="font-size:14px; margin-top:15px; color:#aaa;">🤖 Los resultados se envían a tu Telegram automáticamente.</p>
         <button class="btn-blue" style="width: 100%; margin-top: 20px;" onclick="cerrarPanelNotas()">Volver al Editor</button>
     </div>
 </div>
@@ -199,11 +206,7 @@
 <!-- QUIZ DEL ALUMNO -->
 <div id="quiz-view" class="container hidden">
     <div class="progress-container"><div id="timer-fill"></div></div>
-    <div id="game-content" style="text-align: center;">
-        <img id="display-img" class="quiz-img hidden" src="" alt="imagen pregunta">
-        <h1 id="display-q" style="font-size: 28px; margin-bottom: 30px; text-shadow: 0 0 8px rgba(255,255,255,0.2);"></h1>
-        <div id="display-options" class="options-grid"></div>
-    </div>
+    <div id="game-content" style="text-align: center;"></div>
     <div style="text-align: center; margin-top: 50px;">
         <button id="main-check-btn" class="btn-green" style="width: 80%; padding: 22px; font-size: 18px;" onclick="validateSelection()">Validar Respuesta</button>
     </div>
@@ -224,27 +227,33 @@
     // ==========================================
     // CONFIGURACIÓN
     // ==========================================
-    const FORMSPREE_URL = 'https://formspree.io/f/mlgawnkq'; // Tu endpoint
     const STORAGE_KEY = 'duoquiz_resultados';
-    const TEACHER_PASSWORD = 'profe123'; // Cambia esta contraseña
+    const TELEGRAM_CONFIG_KEY = 'duoquiz_telegram'; // { token, chatid }
+    const TEACHER_PASSWORD = 'profe123'; // Cámbiala si quieres
 
     // ==========================================
-    // CODIFICACIÓN COMPATIBLE (sin TextDecoder)
+    // CODIFICACIÓN COMPATIBLE (iOS safe)
     // ==========================================
     function encodeBase64(str) {
-        // Convierte a Base64 seguro para URL
         const utf8Bytes = unescape(encodeURIComponent(str));
         return btoa(utf8Bytes);
     }
-
     function decodeBase64(base64) {
-        // Decodifica Base64 a string UTF-8
         try {
             const binary = atob(base64);
             return decodeURIComponent(escape(binary));
         } catch (e) {
             return null;
         }
+    }
+
+    // ==========================================
+    // FORMATEO DE TEXTO: Primera mayúscula, resto minúsculas
+    // ==========================================
+    function capitalizarFrase(texto) {
+        if (!texto || typeof texto !== 'string') return texto;
+        texto = texto.trim();
+        return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
     }
 
     // ==========================================
@@ -259,7 +268,53 @@
     let studentScore = 0;
     let esProfesor = false;
     let quizCompletado = false;
-    let lastCorrectText = "";  // guarda la respuesta correcta actual
+    let lastCorrectText = "";
+
+    // ==========================================
+    // GESTIÓN DE CONFIGURACIÓN TELEGRAM
+    // ==========================================
+    function obtenerConfigTelegram() {
+        const saved = localStorage.getItem(TELEGRAM_CONFIG_KEY);
+        if (saved) {
+            try { return JSON.parse(saved); } catch(e) { return {token:'', chatid:''}; }
+        }
+        return { token: '', chatid: '' };
+    }
+
+    function guardarConfigTelegram() {
+        const token = document.getElementById('tg-token').value.trim();
+        const chatid = document.getElementById('tg-chatid').value.trim();
+        if (!token || !chatid) {
+            alert('Completa ambos campos de Telegram.');
+            return;
+        }
+        localStorage.setItem(TELEGRAM_CONFIG_KEY, JSON.stringify({ token, chatid }));
+        alert('✅ Configuración de Telegram guardada correctamente.');
+    }
+
+    async function probarTelegram() {
+        const { token, chatid } = obtenerConfigTelegram();
+        if (!token || !chatid) {
+            alert('Primero guarda la configuración de Telegram.');
+            return;
+        }
+        const msg = encodeURIComponent('🧪 Prueba de DuoQuiz Pro: ¡conexión exitosa!');
+        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatid}&text=${msg}`;
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.ok) alert('✅ Mensaje de prueba enviado a Telegram.');
+            else alert('❌ Error de Telegram: ' + (data.description || ''));
+        } catch (err) {
+            alert('❌ Error de conexión: ' + err.message);
+        }
+    }
+
+    function cargarConfigTelegramEnForm() {
+        const { token, chatid } = obtenerConfigTelegram();
+        if (token) document.getElementById('tg-token').value = token;
+        if (chatid) document.getElementById('tg-chatid').value = chatid;
+    }
 
     // ==========================================
     // AUTENTICACIÓN PROFESOR
@@ -270,8 +325,9 @@
             document.getElementById('teacher-auth-view').classList.add('hidden');
             document.getElementById('editor-view').classList.remove('hidden');
             esProfesor = true;
+            cargarConfigTelegramEnForm();
             if (document.getElementById('questions-container').children.length === 0) {
-                addQuestion(); // primera pregunta
+                addQuestion();
             }
         } else {
             document.getElementById('auth-error').style.display = 'block';
@@ -348,7 +404,7 @@
                     <p>Copia y comparte:</p>
                     <div style="background:#0a0b1e; border:1px solid var(--neon-blue); border-radius:12px; padding:15px; word-break:break-all; font-family:monospace; margin-bottom:20px;" id="url-text">${url}</div>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <button class="btn-green" style="flex:2;" onclick="window.copiarEnlaceModal()">📋 Copiar</button>
+                        <button class="btn-green" style="flex:2;" onclick="navigator.clipboard.writeText(document.getElementById('url-text').innerText);alert('✅ Copiado')">📋 Copiar</button>
                         <button class="btn-blue" style="flex:1;" onclick="window.open('${url}', '_blank')">🚀 Probar</button>
                         <button class="btn-red" style="flex:1;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
                     </div>
@@ -357,17 +413,10 @@
         `;
         const oldModal = document.getElementById('url-modal'); if (oldModal) oldModal.remove();
         document.body.insertAdjacentHTML('beforeend', modalHTML);
-        window.copiarEnlaceModal = () => {
-            const urlText = document.getElementById('url-text').innerText;
-            navigator.clipboard.writeText(urlText).catch(() => {
-                const ta = document.createElement('textarea'); ta.value = urlText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-            });
-            alert('✅ Enlace copiado al portapapeles');
-        };
     }
 
     // ==========================================
-    // ALMACENAMIENTO LOCAL Y CORREO
+    // ALMACENAMIENTO LOCAL Y ENVÍO A TELEGRAM
     // ==========================================
     function guardarLocalmente(registro) {
         let registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -375,32 +424,33 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
     }
 
-    async function enviarResultadosPorCorreo(nombre, cedula, puntos, total) {
-        const datos = {
-            nombre, cedula, nota: puntos, total_preguntas: total,
-            fecha: new Date().toLocaleString()
-        };
+    async function enviarResultadosTelegram(nombre, cedula, puntos, total) {
+        const { token, chatid } = obtenerConfigTelegram();
+        if (!token || !chatid) {
+            console.warn('Telegram no configurado, resultado no enviado.');
+            return false;
+        }
+        const mensaje = `📋 *Resultado de Quiz*%0A👤 Nombre: ${nombre}%0A🆔 Cédula: ${cedula}%0A✅ Nota: ${puntos} / ${total}%0A📅 Fecha: ${new Date().toLocaleString()}`;
+        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatid}&text=${mensaje}&parse_mode=Markdown`;
         try {
-            const response = await fetch(FORMSPREE_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-            return response.ok;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.ok;
         } catch (error) {
+            console.error('Error al enviar a Telegram:', error);
             return false;
         }
     }
 
     async function guardarPuntaje(nombre, cedula, puntos, totalPreguntas) {
-        guardarLocalmente({ nombre, cedula, nota: puntos, total_preguntas: totalPreguntas, fecha: new Date().toISOString() });
-        await enviarResultadosPorCorreo(nombre, cedula, puntos, totalPreguntas);
+        const registro = { nombre, cedula, nota: puntos, total_preguntas: totalPreguntas, fecha: new Date().toISOString() };
+        guardarLocalmente(registro);
+        const enviado = await enviarResultadosTelegram(nombre, cedula, puntos, totalPreguntas);
+        if (!enviado) console.warn('El mensaje de Telegram no se envió, pero se guardó localmente.');
         return true;
     }
 
-    function obtenerRegistrosLocales() {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    }
+    function obtenerRegistrosLocales() { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
 
     function borrarTodosLosRegistros() {
         if (!confirm('⚠️ ¿Eliminar TODOS los registros locales?')) return;
@@ -420,24 +470,21 @@
     async function abrirPanelNotas() {
         document.getElementById('editor-view').classList.add('hidden');
         document.getElementById('dashboard-view').classList.remove('hidden');
-        const tbody = document.getElementById('notas-body');
         const registros = obtenerRegistrosLocales();
+        const tbody = document.getElementById('notas-body');
         if (registros.length === 0) {
             tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Aún no hay registros locales.</td></tr>`;
             return;
         }
-        registros.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-        tbody.innerHTML = '';
-        registros.forEach(fila => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${fila.nombre || ''}</td>
-                    <td>${fila.cedula || ''}</td>
-                    <td><strong style="color:var(--neon-green)">${fila.nota || 0} / ${fila.total_preguntas || '?'}</strong></td>
-                    <td><button class="btn-delete" onclick="borrarRegistroPorCedula('${fila.cedula}')">🗑️</button></td>
-                </tr>
-            `;
-        });
+        registros.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+        tbody.innerHTML = registros.map(fila => `
+            <tr>
+                <td>${fila.nombre || ''}</td>
+                <td>${fila.cedula || ''}</td>
+                <td><strong style="color:var(--neon-green)">${fila.nota || 0} / ${fila.total_preguntas || '?'}</strong></td>
+                <td><button class="btn-delete" onclick="borrarRegistroPorCedula('${fila.cedula}')">🗑️</button></td>
+            </tr>
+        `).join('');
     }
 
     function cerrarPanelNotas() {
@@ -450,8 +497,7 @@
     // ==========================================
     function init() {
         const params = new URLSearchParams(window.location.search);
-        if (params.has('quiz')) {
-            // Modo estudiante: debe cargar el quiz
+        if(params.has('quiz')) {
             try {
                 const encoded = params.get('quiz');
                 const jsonString = decodeBase64(encoded);
@@ -461,30 +507,24 @@
                 window.quizTime = parseInt(decoded.time);
                 esProfesor = false;
                 quizCompletado = false;
-                document.getElementById('login-view').classList.remove('hidden');
-                // Ocultar editor y autenticación
                 document.getElementById('teacher-auth-view').classList.add('hidden');
                 document.getElementById('editor-view').classList.add('hidden');
-            } catch (e) {
-                alert("❌ Error al cargar el quiz. El enlace puede estar dañado o ser incompatible.");
+                document.getElementById('login-view').classList.remove('hidden');
+            } catch(e) {
+                alert("❌ Error al cargar el quiz.");
                 location.href = location.pathname;
             }
         } else {
-            // Sin parámetro quiz: pedir contraseña al profesor
             document.getElementById('teacher-auth-view').classList.remove('hidden');
             document.getElementById('editor-view').classList.add('hidden');
             document.getElementById('login-view').classList.add('hidden');
-            esProfesor = false; // aún no autenticado
         }
     }
 
     function iniciarProtocoloAlumno() {
         const nombre = document.getElementById('student-name').value.trim();
         const cedula = document.getElementById('student-id').value.trim();
-        if (nombre === "" || cedula === "") {
-            alert("Completa tus datos.");
-            return;
-        }
+        if(nombre === "" || cedula === "") { alert("Completa tus datos."); return; }
         studentProfile.name = nombre;
         studentProfile.id = cedula;
         studentScore = 0;
@@ -495,34 +535,30 @@
 
     function renderQuestion() {
         const q = quizData[currentIndex];
-        // Guardar texto de la respuesta correcta
-        lastCorrectText = q.options.find(o => o.correct).text || "Sin definir";
-        document.getElementById('display-q').innerText = q.q;
-        const displayImg = document.getElementById('display-img');
-        if (q.img && q.img.trim() !== "") {
-            displayImg.src = q.img;
-            displayImg.classList.remove('hidden');
-        } else {
-            displayImg.classList.add('hidden');
-        }
+        // Aplicar capitalización al enunciado y a las opciones
+        const enunciado = capitalizarFrase(q.q);
+        lastCorrectText = capitalizarFrase(q.options.find(o => o.correct).text || "Sin definir");
+        document.getElementById('game-content').innerHTML = `
+            <img id="display-img" class="quiz-img ${q.img && q.img.trim() ? '' : 'hidden'}" src="${q.img}" alt="imagen pregunta">
+            <h1 id="display-q" style="font-size: 28px; margin-bottom: 30px; text-shadow: 0 0 8px rgba(255,255,255,0.2);">${enunciado}</h1>
+            <div id="display-options" class="options-grid"></div>
+        `;
         const optionsGrid = document.getElementById('display-options');
-        optionsGrid.innerHTML = '';
+        const shuffled = [...q.options].sort(() => Math.random() - 0.5);
         selectedIdx = null;
-        const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
-        shuffledOptions.forEach((opt, index) => {
+        window.selectedCorrect = false;
+        shuffled.forEach((opt, idx) => {
             const btn = document.createElement('div');
             btn.className = 'opt-btn';
-            btn.innerText = opt.text;
+            btn.innerText = capitalizarFrase(opt.text);
             btn.onclick = () => {
                 document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
-                selectedIdx = index;
-                // guardamos si es correcta para la validación manual
+                selectedIdx = idx;
                 window.selectedCorrect = opt.correct;
             };
             optionsGrid.appendChild(btn);
         });
-        window.selectedCorrect = false; // reset
         startTimer();
     }
 
@@ -539,11 +575,11 @@
         }, 50);
         timerInterval = setInterval(() => {
             timeLeft--;
-            if (timeLeft <= 5) {
+            if(timeLeft <= 5) {
                 bar.style.backgroundColor = 'var(--neon-pink)';
                 bar.style.boxShadow = '0 0 15px var(--neon-pink)';
             }
-            if (timeLeft <= 0) {
+            if(timeLeft <= 0) {
                 clearInterval(timerInterval);
                 handleTimeOut();
             }
@@ -551,51 +587,39 @@
     }
 
     function validateSelection() {
-        if (selectedIdx === null) return;
+        if(selectedIdx === null) return;
         clearInterval(timerInterval);
-        if (window.selectedCorrect) studentScore++;
+        if(window.selectedCorrect) studentScore++;
         showFeedback(window.selectedCorrect);
     }
 
     function handleTimeOut() {
-        // Sin selección, mostramos la respuesta correcta
         showFeedback(false, "Se acabó el tiempo");
     }
 
     function showFeedback(isCorrect, customTitle) {
-        if (autoNextTimer) clearTimeout(autoNextTimer);
+        if(autoNextTimer) clearTimeout(autoNextTimer);
         const bar = document.getElementById('feedback-bar');
-        const title = document.getElementById('fb-title');
-        const sub = document.getElementById('fb-sub');
-        const btn = document.getElementById('fb-btn');
         bar.className = 'feedback-bar show ' + (isCorrect ? 'correct-bg' : 'wrong-bg');
-        title.innerText = customTitle || (isCorrect ? "¡Correctooo!" : "Error de Datos");
-        title.style.color = isCorrect ? "var(--neon-green)" : "var(--neon-pink)";
-
-        if (!isCorrect) {
-            sub.innerText = `Respuesta correcta: ${lastCorrectText}`;
-            autoNextTimer = setTimeout(() => { nextQuestion(); }, 3000);
-            btn.innerText = "Siguiente (auto)";
-        } else {
-            sub.innerText = "Puntuación incrementada";
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 }, colors: ['#39ff14', '#00f3ff', '#ff00e0'] });
-            btn.innerText = "Siguiente";
-        }
+        document.getElementById('fb-title').innerText = customTitle || (isCorrect ? "¡Correctooo!" : "Error de Datos");
+        document.getElementById('fb-title').style.color = isCorrect ? "var(--neon-green)" : "var(--neon-pink)";
+        document.getElementById('fb-sub').innerText = isCorrect ? "Puntuación incrementada" : `Respuesta correcta: ${lastCorrectText}`;
+        const btn = document.getElementById('fb-btn');
         btn.className = isCorrect ? 'btn-green' : 'btn-red';
+        btn.innerText = isCorrect ? "Siguiente" : "Siguiente (auto)";
+        if(!isCorrect) {
+            autoNextTimer = setTimeout(() => nextQuestion(), 3000);
+        } else {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 }, colors: ['#39ff14', '#00f3ff', '#ff00e0'] });
+        }
     }
 
     function nextQuestion() {
-        if (autoNextTimer) {
-            clearTimeout(autoNextTimer);
-            autoNextTimer = null;
-        }
+        if(autoNextTimer) { clearTimeout(autoNextTimer); autoNextTimer = null; }
         document.getElementById('feedback-bar').classList.remove('show');
         currentIndex++;
-        if (currentIndex < quizData.length) {
-            renderQuestion();
-        } else {
-            finalizarYCargarNotas();
-        }
+        if(currentIndex < quizData.length) renderQuestion();
+        else finalizarYCargarNotas();
     }
 
     async function finalizarYCargarNotas() {
@@ -604,22 +628,17 @@
         document.getElementById('game-content').innerHTML = `<div style="text-align:center;"><h2 style="color:var(--neon-blue);">ENVIANDO RESULTADOS...</h2></div>`;
         document.getElementById('main-check-btn').classList.add('hidden');
         document.getElementById('timer-fill').parentElement.classList.add('hidden');
-
         let exito = true, errorMsg = '';
         try {
             await guardarPuntaje(studentProfile.name, studentProfile.id, studentScore, total);
-        } catch (e) {
-            exito = false;
-            errorMsg = e.message;
-        }
-
+        } catch(e) { exito = false; errorMsg = e.message; }
         document.getElementById('game-content').innerHTML = `
             <div style="animation: fadeIn 1s ease;">
                 <h1 style="color: var(--neon-green); font-size: 35px;">MISIÓN CUMPLIDA</h1>
                 <p style="font-size: 20px;">Estudiante: <span style="color:var(--neon-blue)">${studentProfile.name}</span></p>
                 <p style="font-size: 24px; font-weight: 700;">Nota: ${studentScore} / ${total}</p>
                 <div style="padding: 10px; margin: 20px auto; max-width: 300px; border: 1px solid ${exito ? 'var(--neon-green)' : 'var(--neon-pink)'}; border-radius: 10px;">
-                    ${exito ? '✅ Resultados enviados' : '❌ Error: ' + errorMsg}
+                    ${exito ? '✅ Resultados enviados a Telegram' : '❌ Error: ' + errorMsg}
                 </div>
                 <div style="margin-top: 30px; padding: 20px; background: #0f1225; border-radius: 15px; border: 1px solid var(--neon-blue);">
                     <h3 style="color: var(--neon-blue); margin: 0 0 10px;">🔒 Sesión finalizada</h3>
@@ -627,17 +646,12 @@
                 </div>
             </div>
         `;
-        esProfesor = false;
     }
 
-    // Prevenir que el alumno vuelva atrás o acceda al editor
     window.addEventListener('popstate', function() {
         if (!esProfesor && !quizCompletado) {
-            if (confirm('¿Abandonar el quiz? Perderás tu progreso.')) {
-                location.href = location.pathname;
-            } else {
-                history.pushState(null, null, location.href);
-            }
+            if (confirm('¿Abandonar el quiz? Perderás tu progreso.')) location.href = location.pathname;
+            else history.pushState(null, null, location.href);
         }
     });
 
