@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>DuoQuiz Pro - Neon Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" crossorigin="anonymous"></script>
+    <!-- Librería de compresión LZ-String para acortar enlaces -->
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -193,22 +195,6 @@
     const TEACHER_PASSWORD = 'profe123';
 
     // ==========================================
-    // CODIFICACIÓN COMPATIBLE (iOS safe)
-    // ==========================================
-    function encodeBase64(str) {
-        const utf8Bytes = unescape(encodeURIComponent(str));
-        return btoa(utf8Bytes);
-    }
-    function decodeBase64(base64) {
-        try {
-            const binary = atob(base64);
-            return decodeURIComponent(escape(binary));
-        } catch (e) {
-            return null;
-        }
-    }
-
-    // ==========================================
     // UTILIDADES DE SEGURIDAD
     // ==========================================
     function escapeHTML(text) {
@@ -218,7 +204,6 @@
     }
     function escapeMarkdownV1(text) {
         if (!text) return text;
-        // Escapa _, *, ` (caracteres especiales de Markdown V1)
         return text.replace(/([_*`])/g, '\\$1');
     }
 
@@ -469,6 +454,9 @@
         document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
     }
 
+    // ==========================================
+    // EXPORTAR QUIZ CON ENLACE COMPRIMIDO (MÁS CORTO)
+    // ==========================================
     function exportQuiz() {
         const cards = document.querySelectorAll('#questions-container .q-card');
         const data = Array.from(cards).map(card => {
@@ -483,8 +471,10 @@
         if (data.length === 0) return alert("❌ Error: No hay datos suficientes.");
         const config = { time: document.getElementById('global-timer').value || 20, questions: data };
         const jsonString = JSON.stringify(config);
-        const encoded = encodeBase64(jsonString);
-        const url = window.location.origin + window.location.pathname + '?quiz=' + encodeURIComponent(encoded);
+
+        // Usar LZString para comprimir y hacer el enlace mucho más corto
+        const compressed = LZString.compressToEncodedURIComponent(jsonString);
+        const url = window.location.origin + window.location.pathname + '?quiz=' + compressed;
 
         if (window.location.protocol === 'file:') {
             alert('⚠️ Archivo local. Sube este HTML a un servidor para compartir.');
@@ -493,8 +483,8 @@
         const modalHTML = `
             <div id="url-modal" class="modal-overlay">
                 <div class="modal-content">
-                    <h3 style="color:var(--neon-green); margin-top:0;">🔗 Enlace del Protocolo</h3>
-                    <p>Copia y comparte:</p>
+                    <h3 style="color:var(--neon-green); margin-top:0;">🔗 Enlace del Protocolo (Comprimido)</h3>
+                    <p>Copia y comparte este enlace corto:</p>
                     <div style="background:#0a0b1e; border:1px solid var(--neon-blue); border-radius:12px; padding:15px; word-break:break-all; font-family:monospace; margin-bottom:20px;" id="url-text">${escapeHTML(url)}</div>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
                         <button class="btn-green" style="flex:2;" onclick="navigator.clipboard.writeText(document.getElementById('url-text').innerText);alert('✅ Copiado')">📋 Copiar</button>
@@ -523,7 +513,6 @@
             console.warn('Telegram no configurado.');
             return false;
         }
-        // Escapar caracteres especiales de Markdown
         const nombreSeguro = escapeMarkdownV1(nombre);
         const cedulaSegura = escapeMarkdownV1(cedula);
         const mensaje = `📋 *Resultado de Quiz*%0A👤 Nombre: ${nombreSeguro}%0A🆔 Cédula: ${cedulaSegura}%0A✅ Nota: ${puntos} / ${total}%0A📅 Fecha: ${new Date().toLocaleString()}`;
@@ -589,15 +578,16 @@
     }
 
     // ==========================================
-    // FLUJO DEL ALUMNO
+    // FLUJO DEL ALUMNO (carga quiz comprimido)
     // ==========================================
     function init() {
         const params = new URLSearchParams(window.location.search);
         if(params.has('quiz')) {
             try {
-                const encoded = params.get('quiz');
-                const jsonString = decodeBase64(encoded);
-                if (!jsonString) throw new Error("Enlace corrupto");
+                const compressed = params.get('quiz');
+                // Descomprimir usando LZString
+                const jsonString = LZString.decompressFromEncodedURIComponent(compressed);
+                if (!jsonString) throw new Error("Enlace corrupto o no válido");
                 const decoded = JSON.parse(jsonString);
                 quizData = decoded.questions;
                 window.quizTime = parseInt(decoded.time) || 20;
@@ -608,7 +598,7 @@
                 document.getElementById('editor-view').classList.add('hidden');
                 document.getElementById('login-view').classList.remove('hidden');
             } catch(e) {
-                alert("❌ Error al cargar el quiz.");
+                alert("❌ Error al cargar el quiz. Asegúrate de que el enlace no haya sido modificado.");
                 location.href = location.pathname;
             }
         } else {
@@ -628,7 +618,6 @@
         studentScore = 0;
         document.getElementById('login-view').classList.add('hidden');
         document.getElementById('quiz-view').classList.remove('hidden');
-        // Prevenir retroceso accidental
         history.pushState({quiz: true}, '', window.location.href);
         renderQuestion();
     }
@@ -725,7 +714,6 @@
     }
 
     async function finalizarYCargarNotas() {
-        // Ocultar la barra de feedback si estuviera visible
         document.getElementById('feedback-bar').classList.remove('show');
         const total = quizData.length;
         quizCompletado = true;
@@ -755,10 +743,8 @@
     window.addEventListener('popstate', function(event) {
         if (!esProfesor && !quizCompletado && event.state && event.state.quiz) {
             if (confirm('¿Abandonar el quiz? Perderás tu progreso.')) {
-                // Recargar la página sin el quiz
                 location.href = location.pathname;
             } else {
-                // Volver a la vista del quiz
                 history.pushState({quiz: true}, '', location.href);
             }
         }
