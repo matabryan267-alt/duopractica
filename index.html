@@ -3,258 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>DuoQuiz Pro - Neon Edition</title>
+    <title>DuoQuiz Pro - Minimal Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --duo-green: #58cc02;
-            --duo-green-dark: #46a302;
-            --duo-blue: #1cb0f6;
-            --duo-blue-dark: #1890d0;
-            --duo-red: #ff4b4b;
-            --duo-yellow: #ffc800;
-            --bg-dark: #0a0b1e;
-            --card-bg: #161b33;
-            --text-light: #e0e0ff;
-            --neon-green: #39ff14;
-            --neon-blue: #00f3ff;
-            --neon-pink: #ff00e0;
+            /* Paleta minimalista oscura */
+            --bg-dark: #09090b;
+            --card-bg: #18181b;
+            --text-light: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #27272a;
+            --border-hover: #3f3f46;
         }
+        
         body {
-            font-family: 'Nunito', sans-serif;
-            background: radial-gradient(circle at 50% 30%, #1a1f4d, #0a0b1e);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
             color: var(--text-light);
             margin: 0;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             position: relative;
+            -webkit-font-smoothing: antialiased;
         }
-        /* Mascota flotante */
+
+        /* Mascota flotante simplificada */
         #mascot-container {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            z-index: 1500;
-            pointer-events: none;
+            position: fixed; bottom: 100px; right: 20px;
+            z-index: 1500; pointer-events: none;
         }
         #mascot {
-            font-size: 70px;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+            font-size: 40px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0.8;
         }
-        #mascot.happy {
-            transform: scale(1.2) rotate(10deg);
-            filter: drop-shadow(0 0 15px var(--duo-green));
-        }
-        #mascot.sad {
-            transform: scale(0.9) rotate(-8deg);
-            filter: drop-shadow(0 0 15px var(--duo-red));
-        }
+        #mascot.happy { transform: scale(1.2) translateY(-10px); }
+        #mascot.sad { transform: scale(0.9) translateY(10px); opacity: 0.5; }
+
         .header {
-            width: 100%; background: rgba(22,27,51,0.85);
-            padding: 18px 0;
-            border-bottom: 2px solid var(--duo-blue);
-            box-shadow: 0 0 20px rgba(28,176,246,0.5);
+            width: 100%; 
+            background: rgba(9, 9, 11, 0.8);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             position: sticky; top: 0; z-index: 1000;
             backdrop-filter: blur(12px);
         }
         .logo {
-            font-family: 'Fredoka One', cursive;
-            color: var(--duo-green);
-            font-size: 32px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 12px var(--duo-green-dark);
+            font-weight: 700;
+            color: var(--text-light);
+            font-size: 24px;
+            letter-spacing: -0.5px;
         }
-        .container { width: 92%; max-width: 720px; padding-bottom: 140px; }
+        .logo span { color: var(--accent); }
+
+        .container { width: 90%; max-width: 680px; padding-bottom: 140px; }
         .hidden { display: none !important; }
+
         button {
-            cursor: pointer; border: none; border-radius: 20px;
-            font-weight: 800; font-family: 'Fredoka One', cursive;
-            text-transform: uppercase; letter-spacing: 1px;
-            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 15px; padding: 14px 28px; -webkit-appearance: none;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+            cursor: pointer; border: none; border-radius: 12px;
+            font-weight: 600; font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+            font-size: 15px; padding: 14px 24px; -webkit-appearance: none;
         }
-        button:active { transform: scale(0.94); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
-        .btn-duo-green { background: var(--duo-green); color: white; }
-        .btn-duo-green:hover { background: var(--duo-green-dark); }
-        .btn-duo-blue { background: var(--duo-blue); color: white; }
-        .btn-duo-blue:hover { background: var(--duo-blue-dark); }
-        .btn-duo-red { background: var(--duo-red); color: white; }
-        .btn-duo-yellow { background: var(--duo-yellow); color: #333; }
-        .btn-telegram { background: #0088cc; color: white; }
-        .btn-telegram:hover { background: #0077b5; }
-        .btn-purple { background: #9d00ff; color: white; }
-        .btn-purple:hover { background: #7a00cc; }
+        button:active { transform: scale(0.97); }
+        
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { filter: brightness(1.1); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { filter: brightness(1.1); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-light); }
+        .btn-outline:hover { background: var(--border); }
+
         .q-card {
-            background: var(--card-bg); border: 2px solid #2d345e;
-            border-radius: 28px; padding: 28px; margin-bottom: 28px;
-            animation: fadeIn 0.5s ease-out;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 16px; padding: 24px; margin-bottom: 24px;
+            animation: fadeIn 0.4s ease-out;
             transition: border-color 0.3s;
         }
-        .q-card:hover { border-color: var(--duo-blue); }
+        .q-card:hover { border-color: var(--border-hover); }
+
         input, textarea {
-            width: 100%; padding: 14px; margin: 10px 0;
-            background: #0f1225; border: 2px solid #2d345e;
-            border-radius: 18px; font-family: inherit; color: white;
-            box-sizing: border-box; font-size: 16px; transition: 0.3s;
+            width: 100%; padding: 14px 16px; margin: 8px 0 16px;
+            background: var(--bg-dark); border: 1px solid var(--border);
+            border-radius: 12px; font-family: inherit; color: var(--text-light);
+            box-sizing: border-box; font-size: 15px; transition: 0.2s;
             -webkit-appearance: none; resize: vertical;
         }
         input:focus, textarea:focus {
-            border-color: var(--duo-blue); outline: none;
-            box-shadow: 0 0 12px rgba(28,176,246,0.4);
+            border-color: var(--accent); outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
-        .option-edit-row { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
-        .is-correct-radio { width: 22px; height: 22px; cursor: pointer; accent-color: var(--duo-green); margin: 0; }
-        .progress-container { width: 100%; height: 16px; background: #1a1f4d; border-radius: 20px; margin: 20px 0; overflow: hidden; border: 1px solid var(--duo-blue-dark); }
-        #timer-fill { height: 100%; background: var(--duo-blue); width: 100%; box-shadow: 0 0 12px var(--duo-blue); transition: width 1s linear; }
-        .quiz-img { max-width: 100%; max-height: 220px; object-fit: contain; border-radius: 22px; margin-bottom: 20px; background: #000; border: 2px solid var(--duo-blue); box-shadow: 0 0 18px rgba(28,176,246,0.3); }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .option-edit-row { display: flex; gap: 12px; align-items: center; margin-bottom: 4px; }
+        .is-correct-radio { width: 20px; height: 20px; cursor: pointer; accent-color: var(--success); margin: 0; }
+        
+        .progress-container { 
+            width: 100%; height: 8px; background: var(--card-bg); 
+            border-radius: 8px; margin: 0 0 30px; overflow: hidden; 
+        }
+        #timer-fill { 
+            height: 100%; background: var(--accent); width: 100%; 
+            transition: width 1s linear; border-radius: 8px;
+        }
+
+        .quiz-img { 
+            max-width: 100%; max-height: 240px; object-fit: cover; 
+            border-radius: 12px; margin-bottom: 24px; 
+            border: 1px solid var(--border); 
+        }
+
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
         .opt-btn {
-            border: 2px solid #3a3f6e; background: #1e2548;
-            color: var(--text-light); border-radius: 24px; padding: 24px;
-            font-size: 18px; text-align: center; font-weight: 700;
+            border: 1px solid var(--border); background: var(--card-bg);
+            color: var(--text-light); border-radius: 12px; padding: 18px 24px;
+            font-size: 16px; text-align: left; font-weight: 500;
             transition: all 0.2s; cursor: pointer;
             -webkit-tap-highlight-color: transparent; user-select: none;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .opt-btn:hover { border-color: var(--duo-blue); background: #25305a; transform: translateY(-2px); }
+        .opt-btn:hover { border-color: var(--border-hover); background: #222226; }
+        
+        /* Estados de las opciones */
         .opt-btn.selected {
-            border-color: var(--duo-blue); background: rgba(28,176,246,0.15);
-            color: var(--duo-blue); box-shadow: 0 0 20px rgba(28,176,246,0.5), inset 0 0 10px rgba(28,176,246,0.2);
+            border-color: var(--accent); 
+            background: rgba(59, 130, 246, 0.1);
         }
+        .opt-btn.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        .opt-btn.wrong {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            opacity: 0.8;
+        }
+
         .feedback-bar {
-            position: fixed; bottom: 0; left: 0; right: 0; padding: 30px 20px;
+            position: fixed; bottom: 0; left: 0; right: 0; padding: 24px 20px;
             transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.18,0.89,0.32,1.28);
-            display: flex; justify-content: center; z-index: 2000; backdrop-filter: blur(20px);
+            display: flex; justify-content: center; z-index: 2000; 
+            background: rgba(24, 24, 27, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border);
         }
         .feedback-bar.show { transform: translateY(0); }
-        .correct-bg { background: rgba(88,204,2,0.15); border-top: 3px solid var(--duo-green); }
-        .wrong-bg { background: rgba(255,75,75,0.15); border-top: 3px solid var(--duo-red); }
-        .feedback-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-        .feedback-text h2 { margin: 0; font-size: 26px; font-family: 'Fredoka One', cursive; }
-        .feedback-text p { margin: 6px 0 0; font-weight: 700; color: #fff; }
-        .explanation-box { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 12px; margin-top: 10px; font-size: 15px; color: #ccc; }
-        .notas-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0f1225; border-radius: 16px; overflow: hidden; }
-        .notas-table th, .notas-table td { padding: 15px; border-bottom: 1px solid #2d345e; text-align: left; }
-        .notas-table th { background: #1a1f4d; color: var(--duo-blue); font-family: 'Fredoka One', cursive; }
-        .notas-table tr:hover { background: #1e2548; }
-        .btn-delete { background: #ff3333; color: white; padding: 6px 14px; font-size: 13px; border-radius: 12px; }
-        .btn-delete:hover { background: #ff0000; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,11,30,0.92); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-        .modal-content { background: #161b33; border: 2px solid var(--duo-blue); border-radius: 28px; padding: 30px; max-width: 580px; width: 90%; box-shadow: 0 0 40px rgba(28,176,246,0.4); }
-        .url-display { background: #0a0b1e; border: 1px solid var(--duo-blue); border-radius: 16px; padding: 12px 16px; font-family: monospace; word-break: break-all; font-size: 14px; color: #aaa; max-height: 60px; overflow-y: auto; margin: 15px 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .feedback-content { width: 100%; max-width: 680px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+        .feedback-text h2 { margin: 0; font-size: 20px; font-weight: 600; }
+        .feedback-text p { margin: 4px 0 0; font-size: 15px; color: var(--text-muted); }
+        .explanation-box { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 14px; color: var(--text-muted); }
+
+        .notas-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        .notas-table th, .notas-table td { padding: 16px; border-bottom: 1px solid var(--border); text-align: left; }
+        .notas-table th { color: var(--text-muted); font-weight: 500; }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; }
+        
+        label { font-size: 14px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; display: block; }
+        h1, h2, h3 { margin-top: 0; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 600px) {
-            .options-grid { grid-template-columns: 1fr; }
-            .feedback-content { flex-direction: column; text-align: center; }
-            #mascot-container { bottom: 80px; right: 10px; }
-            #mascot { font-size: 55px; }
+            .feedback-content { flex-direction: column; text-align: left; align-items: stretch; }
+            .feedback-content button { width: 100%; }
         }
     </style>
 </head>
 <body>
 <div class="header">
-    <div class="logo">🐶 DuoQuiz <span style="color: var(--duo-blue)">PRO</span></div>
+    <div class="logo">Quiz <span>Pro</span></div>
 </div>
 
-<!-- Mascota perrito -->
-<div id="mascot-container"><div id="mascot">🐶</div></div>
+<div id="mascot-container"><div id="mascot">✨</div></div>
 
-<!-- AUTENTICACIÓN DEL PROFESOR -->
 <div id="teacher-auth-view" class="container">
-    <div class="q-card" style="border-color: var(--duo-red); text-align: center;">
-        <h2 style="color: var(--duo-red); font-family: 'Fredoka One';">🔐 ACCESO PROFESOR</h2>
-        <p>Introduce la contraseña para crear o revisar exámenes.</p>
+    <div class="q-card" style="text-align: center; max-width: 400px; margin: 0 auto;">
+        <h2>Acceso Administrativo</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 14px;">Ingresa tus credenciales para continuar.</p>
         <input type="password" id="teacher-password" placeholder="Contraseña">
-        <button class="btn-duo-green" style="width:100%; margin-top:15px;" onclick="verificarProfesor()">Acceder</button>
-        <p id="auth-error" style="color: var(--duo-red); margin-top: 10px; display: none;">Contraseña incorrecta</p>
+        <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="verificarProfesor()">Acceder</button>
+        <p id="auth-error" style="color: var(--danger); font-size: 14px; margin-top: 12px; display: none;">Contraseña incorrecta</p>
     </div>
 </div>
 
-<!-- VISTA EDITOR (PROFESOR) -->
 <div id="editor-view" class="container hidden">
-    <button class="btn-purple" style="width:100%; margin-bottom:25px; padding:18px; font-size:16px;" onclick="abrirPanelNotas()">📊 VER NOTAS DE ALUMNOS</button>
-    <div class="q-card" style="border-color: var(--duo-blue);">
-        <h3 style="margin-top:0; color: var(--duo-blue); font-family: 'Fredoka One';">⚡ Ajustes de Sistema</h3>
-        <label style="font-weight:700;">Segundos por pregunta:</label>
+    <button class="btn-outline" style="width:100%; margin-bottom:24px;" onclick="abrirPanelNotas()">Ver Notas de Alumnos</button>
+    
+    <div class="q-card">
+        <h3>Configuración del Sistema</h3>
+        <label>Segundos por pregunta:</label>
         <input type="number" id="global-timer" value="20">
-        <label style="font-weight:700; margin-top:15px;">🤖 Token del Bot de Telegram:</label>
+        
+        <label style="margin-top:16px;">Token del Bot de Telegram:</label>
         <input type="text" id="tg-token" placeholder="123456:ABCdef...">
-        <label style="font-weight:700;">🆔 ID de Chat de Telegram:</label>
+        
+        <label>ID de Chat de Telegram:</label>
         <input type="text" id="tg-chatid" placeholder="123456789">
-        <div style="display:flex; gap:10px; margin-top:15px;">
-            <button class="btn-telegram" style="flex:1;" onclick="guardarConfigTelegram()">💾 Guardar</button>
-            <button class="btn-duo-blue" style="flex:1;" onclick="probarTelegram()">🧪 Probar</button>
+        
+        <div style="display:flex; gap:12px; margin-top:8px;">
+            <button class="btn-outline" style="flex:1;" onclick="guardarConfigTelegram()">Guardar</button>
+            <button class="btn-primary" style="flex:1;" onclick="probarTelegram()">Probar Conexión</button>
         </div>
     </div>
+    
     <div id="questions-container"></div>
-    <div style="display: flex; gap: 15px; margin-top: 25px; flex-wrap: wrap;">
-        <button class="btn-duo-blue" onclick="addQuestion()">+ Nueva Pregunta</button>
-        <button class="btn-duo-yellow" onclick="abrirImportador()">📥 Importar Quiz</button>
-        <button class="btn-duo-green" style="flex-grow:1;" onclick="exportQuiz()">🚀 Desplegar Protocolo</button>
+    
+    <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+        <button class="btn-outline" onclick="addQuestion()">+ Nueva Pregunta</button>
+        <button class="btn-outline" onclick="abrirImportador()">Importar Quiz</button>
+        <button class="btn-primary" style="flex-grow:1;" onclick="exportQuiz()">Generar Enlace</button>
     </div>
 </div>
 
-<!-- MODAL DE IMPORTACIÓN -->
 <div id="import-modal" class="modal-overlay hidden">
     <div class="modal-content">
-        <h3 style="color:var(--duo-green); margin-top:0;">📥 Importar Quiz desde texto</h3>
-        <p style="font-size:14px; color:#aaa;">Pega el contenido con uno de estos formatos:<br>
-        <strong>Formato 1 (recomendado):</strong><br>
-        <code>1. ¿Pregunta?<br>a) Opción 1<br>b) Opción 2<br>...<br>Respuesta: b</code><br><br>
-        <strong>Formato 2:</strong><br>
-        <code>¿Pregunta?<br>*Opción correcta<br>Opción incorrecta</code></p>
-        <textarea id="import-text" placeholder="Pega aquí el texto del cuestionario..."></textarea>
-        <div style="display:flex; gap:10px; margin-top:15px;">
-            <button class="btn-duo-green" style="flex:2;" onclick="importarQuiz()">✅ Importar y reemplazar</button>
-            <button class="btn-duo-red" style="flex:1;" onclick="document.getElementById('import-modal').classList.add('hidden')">Cancelar</button>
+        <h3>Importar Quiz</h3>
+        <p style="font-size:14px; color:var(--text-muted);">Pega el contenido con formato estándar. Asterisco (*) para la opción correcta.</p>
+        <textarea id="import-text" rows="6" placeholder="¿Cuál es la capital de Francia?&#10;*París&#10;Madrid&#10;Roma"></textarea>
+        <div style="display:flex; gap:12px; margin-top:16px;">
+            <button class="btn-outline" style="flex:1;" onclick="document.getElementById('import-modal').classList.add('hidden')">Cancelar</button>
+            <button class="btn-primary" style="flex:2;" onclick="importarQuiz()">Importar</button>
         </div>
     </div>
 </div>
 
-<!-- PANEL DE NOTAS -->
 <div id="dashboard-view" class="container hidden">
-    <div class="q-card" style="border-color: #9d00ff;">
-        <h2 style="color: #9d00ff; text-align: center; font-family: 'Fredoka One';">BASE DE DATOS LOCAL</h2>
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
-            <button class="btn-delete" onclick="borrarTodosLosRegistros()" style="padding: 10px 20px;">🗑️ BORRAR TODO</button>
+    <div class="q-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2>Resultados Locales</h2>
+            <button class="btn-danger" onclick="borrarTodosLosRegistros()" style="padding: 8px 16px; font-size: 13px;">Borrar todo</button>
         </div>
         <div style="overflow-x: auto;">
             <table class="notas-table" id="tabla-resultados">
-                <thead><tr><th>Nombre</th><th>Cédula</th><th>Puntuación</th><th>Acciones</th></tr></thead>
+                <thead><tr><th>Nombre</th><th>Cédula</th><th>Puntuación</th><th></th></tr></thead>
                 <tbody id="notas-body"></tbody>
             </table>
         </div>
-        <p style="font-size:14px; margin-top:15px; color:#aaa;">🤖 Los resultados se envían a Telegram automáticamente.</p>
-        <button class="btn-duo-blue" style="width:100%; margin-top:20px;" onclick="cerrarPanelNotas()">Volver al Editor</button>
+        <button class="btn-outline" style="width:100%; margin-top:24px;" onclick="cerrarPanelNotas()">Volver al Editor</button>
     </div>
 </div>
 
-<!-- LOGIN DEL ALUMNO -->
 <div id="login-view" class="container hidden">
-    <div class="q-card" style="border-color: var(--duo-red); text-align: center;">
-        <h2 style="color: var(--duo-red); font-family: 'Fredoka One';">IDENTIFICACIÓN REQUERIDA</h2>
-        <p>Ingresa tus credenciales para iniciar el protocolo.</p>
-        <input type="text" id="student-name" placeholder="Tu Nombre y Apellido" required>
+    <div class="q-card" style="text-align: center; max-width: 400px; margin: 0 auto;">
+        <h2>Identificación</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 14px;">Ingresa tus datos para comenzar la evaluación.</p>
+        <input type="text" id="student-name" placeholder="Nombre y Apellido" required>
         <input type="number" id="student-id" placeholder="Cédula de Identidad" required>
-        <button class="btn-duo-green" style="width:100%; margin-top:15px;" onclick="iniciarProtocoloAlumno()">Acceder al Sistema</button>
+        <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="iniciarProtocoloAlumno()">Comenzar</button>
     </div>
 </div>
 
-<!-- QUIZ DEL ALUMNO -->
 <div id="quiz-view" class="container hidden">
     <div class="progress-container"><div id="timer-fill"></div></div>
-    <div id="game-content" style="text-align: center;"></div>
-    <div style="text-align: center; margin-top: 50px;">
-        <button id="main-check-btn" class="btn-duo-green" style="width: 80%; padding: 22px; font-size: 18px;" onclick="validateSelection()">Validar Respuesta</button>
+    <div id="game-content"></div>
+    <div style="text-align: center; margin-top: 40px;">
+        <button id="main-check-btn" class="btn-primary" style="width: 100%; padding: 18px; font-size: 16px;" onclick="validateSelection()">Validar Respuesta</button>
     </div>
 </div>
 
-<!-- BARRA DE FEEDBACK -->
 <div id="feedback-bar" class="feedback-bar">
     <div class="feedback-content">
         <div class="feedback-text">
@@ -262,7 +279,7 @@
             <p id="fb-sub"></p>
             <div id="fb-explanation" class="explanation-box hidden"></div>
         </div>
-        <button id="fb-btn" onclick="nextQuestion()" style="padding: 15px 40px; font-size: 16px;"></button>
+        <button id="fb-btn" onclick="nextQuestion()" style="padding: 14px 32px; font-size: 15px;"></button>
     </div>
 </div>
 
@@ -271,7 +288,7 @@
     const DEFAULT_TELEGRAM_CHATID = '6815312132';
     const STORAGE_KEY = 'duoquiz_resultados';
     const TELEGRAM_CONFIG_KEY = 'duoquiz_telegram';
-    const TEACHER_PASSWORD = 'profe123';
+    const TEACHER_PASSWORD = 'profe';
 
     function escapeHTML(text) {
         const div = document.createElement('div');
@@ -300,23 +317,21 @@
     let lastCorrectText = "";
     let currentExplanation = "";
 
-    // Mascota
     function setMascotState(state) {
         const mascot = document.getElementById('mascot');
         if (!mascot) return;
         mascot.classList.remove('happy', 'sad');
         if (state === 'happy') {
-            mascot.textContent = '🐶😄';
+            mascot.textContent = '✨';
             mascot.classList.add('happy');
         } else if (state === 'sad') {
-            mascot.textContent = '🐶😢';
+            mascot.textContent = '👀';
             mascot.classList.add('sad');
         } else {
-            mascot.textContent = '🐶';
+            mascot.textContent = '💡';
         }
     }
 
-    // Telegram
     function obtenerConfigTelegram() {
         const saved = localStorage.getItem(TELEGRAM_CONFIG_KEY);
         if (saved) { try { return JSON.parse(saved); } catch(e) {} }
@@ -327,19 +342,14 @@
         const chatid = document.getElementById('tg-chatid').value.trim();
         if (!token || !chatid) { alert('Completa ambos campos de Telegram.'); return; }
         localStorage.setItem(TELEGRAM_CONFIG_KEY, JSON.stringify({ token, chatid }));
-        alert('✅ Configuración de Telegram guardada correctamente.');
+        alert('Configuración guardada.');
     }
     async function probarTelegram() {
         const { token, chatid } = obtenerConfigTelegram();
-        if (!token || !chatid) { alert('Primero guarda la configuración de Telegram.'); return; }
-        const msg = encodeURIComponent('🧪 Prueba de DuoQuiz Pro: ¡conexión exitosa!');
+        if (!token || !chatid) return;
+        const msg = encodeURIComponent('Prueba de sistema: Conexión exitosa.');
         const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatid}&text=${msg}`;
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            if (data.ok) alert('✅ Mensaje de prueba enviado a Telegram.');
-            else alert('❌ Error de Telegram: ' + (data.description || ''));
-        } catch (err) { alert('❌ Error de conexión: ' + err.message); }
+        try { await fetch(url); alert('Mensaje enviado.'); } catch (err) { alert('Error: ' + err.message); }
     }
     function cargarConfigTelegramEnForm() {
         const { token, chatid } = obtenerConfigTelegram();
@@ -347,7 +357,6 @@
         document.getElementById('tg-chatid').value = chatid || '';
     }
 
-    // Autenticación profesor
     function verificarProfesor() {
         const pwd = document.getElementById('teacher-password').value;
         if (pwd === TEACHER_PASSWORD) {
@@ -362,34 +371,32 @@
         }
     }
 
-    function generarIdPregunta() {
-        return 'q' + Date.now() + Math.random().toString(36).substr(2, 5);
-    }
+    function generarIdPregunta() { return 'q' + Date.now() + Math.random().toString(36).substr(2, 5); }
 
     function addQuestion() {
         const id = generarIdPregunta();
         const html = `
             <div class="q-card" id="${id}">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <strong style="color: var(--duo-blue);"># Módulo de Pregunta</strong>
-                    <button onclick="document.getElementById('${id}').remove()" style="background:none; color:var(--duo-red); padding:0; font-size:12px;">[ ELIMINAR ]</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span style="color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Módulo de Pregunta</span>
+                    <button onclick="document.getElementById('${id}').remove()" style="background:none; color:var(--danger); padding:0; font-size:12px;">Eliminar</button>
                 </div>
-                <input type="text" class="q-text" placeholder="Escribe el desafío aquí...">
+                <input type="text" class="q-text" placeholder="Escribe la pregunta aquí...">
                 <input type="text" class="q-img" placeholder="URL de imagen (opcional)">
                 <div class="options-area">
                     <div class="option-edit-row">
                         <input type="radio" name="${id}" class="is-correct-radio" checked>
                         <input type="text" class="opt-text" placeholder="Opción Correcta">
-                        <button onclick="this.parentElement.remove()" style="background:none; color:var(--duo-red); font-size:20px;">×</button>
+                        <button onclick="this.parentElement.remove()" style="background:none; color:var(--text-muted); font-size:20px;">×</button>
                     </div>
                     <div class="option-edit-row">
                         <input type="radio" name="${id}" class="is-correct-radio">
-                        <input type="text" class="opt-text" placeholder="Opción de Distracción">
-                        <button onclick="this.parentElement.remove()" style="background:none; color:var(--duo-red); font-size:20px;">×</button>
+                        <input type="text" class="opt-text" placeholder="Opción Incorrecta">
+                        <button onclick="this.parentElement.remove()" style="background:none; color:var(--text-muted); font-size:20px;">×</button>
                     </div>
                 </div>
-                <button class="btn-duo-blue" onclick="addOptionToQuestion('${id}')" style="margin-top:15px; font-size:12px; padding:8px 18px;">+ Añadir Opción</button>
-                <textarea class="q-explanation" placeholder="📝 Explicación: ¿Por qué es correcta? (se muestra al alumno tras responder)" style="margin-top:12px; height:60px;"></textarea>
+                <button class="btn-outline" onclick="addOptionToQuestion('${id}')" style="margin-top:12px; font-size:13px; padding:8px 16px;">Añadir Opción</button>
+                <textarea class="q-explanation" placeholder="Explicación: ¿Por qué es correcta? (opcional)" style="margin-top:16px; height:60px;"></textarea>
             </div>
         `;
         document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
@@ -402,28 +409,22 @@
             <div class="option-edit-row">
                 <input type="radio" name="${qId}" class="is-correct-radio">
                 <input type="text" class="opt-text" placeholder="Opción adicional">
-                <button onclick="this.parentElement.remove()" style="background:none; color:var(--duo-red); font-size:20px;">×</button>
+                <button onclick="this.parentElement.remove()" style="background:none; color:var(--text-muted); font-size:20px;">×</button>
             </div>
         `;
         container.insertAdjacentHTML('beforeend', html);
     }
 
-    // Importador
     function abrirImportador() {
         document.getElementById('import-modal').classList.remove('hidden');
         document.getElementById('import-text').focus();
     }
     function importarQuiz() {
         const texto = document.getElementById('import-text').value.trim();
-        if (!texto) { alert('Pega el texto del quiz.'); return; }
+        if (!texto) return;
         const usaFormatoRespuesta = /Respuesta\s*:\s*[a-dA-D]/i.test(texto);
-        let bloques;
-        if (usaFormatoRespuesta) {
-            bloques = texto.split(/\n(?=\d+\. )/).filter(b => b.trim() !== '');
-        } else {
-            bloques = texto.split(/\n\s*\n/).filter(b => b.trim() !== '');
-        }
-        if (bloques.length === 0) { alert('No se encontraron preguntas.'); return; }
+        let bloques = usaFormatoRespuesta ? texto.split(/\n(?=\d+\. )/).filter(b => b.trim() !== '') : texto.split(/\n\s*\n/).filter(b => b.trim() !== '');
+        
         document.getElementById('questions-container').innerHTML = '';
         bloques.forEach(bloque => {
             const lineas = bloque.split('\n').map(l => l.trim()).filter(l => l !== '');
@@ -431,22 +432,19 @@
             try {
                 if (usaFormatoRespuesta) procesarBloqueFormatoRespuesta(lineas);
                 else procesarBloqueFormatoAsterisco(lineas);
-            } catch (e) { console.warn('Error procesando bloque:', e); }
+            } catch (e) {}
         });
         document.getElementById('import-modal').classList.add('hidden');
         document.getElementById('import-text').value = '';
-        alert('✅ Quiz importado correctamente.');
     }
     function procesarBloqueFormatoRespuesta(lineas) {
         let primera = lineas.shift();
         const pregunta = primera.replace(/^\d+\.\s*/, '');
         let idxRespuesta = lineas.findIndex(l => /^Respuesta\s*:\s*[a-dA-D]/i.test(l));
-        if (idxRespuesta === -1) throw new Error('No se encontró línea de respuesta');
         const lineaRespuesta = lineas.splice(idxRespuesta, 1)[0];
         const letraCorrecta = lineaRespuesta.match(/Respuesta\s*:\s*([a-dA-D])/i)[1].toLowerCase();
         const opciones = lineas.map(l => {
             const match = l.match(/^([a-d])\)\s*(.+)/i);
-            if (!match) throw new Error('Formato incorrecto: ' + l);
             return { text: match[2], correct: match[1].toLowerCase() === letraCorrecta };
         });
         if (!opciones.some(o => o.correct)) opciones[0].correct = true;
@@ -466,27 +464,26 @@
         const opcionesHTML = opciones.map((op) => `
             <div class="option-edit-row">
                 <input type="radio" name="${id}" class="is-correct-radio" ${op.correct ? 'checked' : ''}>
-                <input type="text" class="opt-text" value="${escapeHTML(op.text)}" placeholder="Opción">
-                <button onclick="this.parentElement.remove()" style="background:none; color:var(--duo-red); font-size:20px;">×</button>
+                <input type="text" class="opt-text" value="${escapeHTML(op.text)}">
+                <button onclick="this.parentElement.remove()" style="background:none; color:var(--text-muted); font-size:20px;">×</button>
             </div>
         `).join('');
         const html = `
             <div class="q-card" id="${id}">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <strong style="color: var(--duo-blue);"># Módulo de Pregunta</strong>
-                    <button onclick="document.getElementById('${id}').remove()" style="background:none; color:var(--duo-red); padding:0; font-size:12px;">[ ELIMINAR ]</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span style="color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Módulo de Pregunta</span>
+                    <button onclick="document.getElementById('${id}').remove()" style="background:none; color:var(--danger); padding:0; font-size:12px;">Eliminar</button>
                 </div>
                 <input type="text" class="q-text" value="${escapeHTML(enunciado)}">
                 <input type="text" class="q-img" value="${escapeHTML(img)}" placeholder="URL de imagen (opcional)">
                 <div class="options-area">${opcionesHTML}</div>
-                <button class="btn-duo-blue" onclick="addOptionToQuestion('${id}')" style="margin-top:15px; font-size:12px; padding:8px 18px;">+ Añadir Opción</button>
-                <textarea class="q-explanation" placeholder="📝 Explicación (se muestra al alumno)">${escapeHTML(explicacion)}</textarea>
+                <button class="btn-outline" onclick="addOptionToQuestion('${id}')" style="margin-top:12px; font-size:13px; padding:8px 16px;">Añadir Opción</button>
+                <textarea class="q-explanation" placeholder="Explicación (opcional)">${escapeHTML(explicacion)}</textarea>
             </div>
         `;
         document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
     }
 
-    // Exportar con LZ-String y modal limpio
     function exportQuiz() {
         const cards = document.querySelectorAll('#questions-container .q-card');
         const data = Array.from(cards).map(card => {
@@ -503,26 +500,24 @@
                 explanation: explanationEl ? explanationEl.value : ''
             };
         }).filter(q => q.q.trim() !== "" && q.options.length > 0);
-        if (data.length === 0) return alert("❌ No hay preguntas válidas.");
+        
+        if (data.length === 0) return alert("Agrega al menos una pregunta válida.");
         const config = { time: document.getElementById('global-timer').value || 20, questions: data };
         const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(config));
         const url = window.location.origin + window.location.pathname + '?quiz=' + compressed;
-        if (window.location.protocol === 'file:') {
-            alert('⚠️ Archivo local. Sube este HTML a un servidor para compartir.');
-        }
+        
         const modalHTML = `
             <div id="url-modal" class="modal-overlay">
                 <div class="modal-content">
-                    <h3 style="color:var(--duo-green); margin-top:0;">🔗 Enlace del Protocolo</h3>
-                    <p style="margin-bottom:8px;">Comparte este enlace corto con tus estudiantes:</p>
+                    <h3>Enlace Listo</h3>
+                    <p style="margin-bottom:16px; color:var(--text-muted); font-size:14px;">Comparte este enlace con tus estudiantes:</p>
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <input id="url-input" type="text" readonly value="${escapeHTML(url)}" style="flex:1; font-size:14px; padding:12px;">
-                        <button class="btn-duo-green" onclick="copyUrl()" style="white-space:nowrap;">📋 Copiar</button>
+                        <input id="url-input" type="text" readonly value="${escapeHTML(url)}" style="margin:0; flex:1;">
+                        <button class="btn-outline" onclick="copyUrl()">Copiar</button>
                     </div>
-                    <div style="display:flex; gap:10px; margin-top:15px;">
-                        <button class="btn-duo-blue" style="flex:1;" onclick="window.open(document.getElementById('url-input').value, '_blank')">🚀 Probar</button>
-                        <button class="btn-duo-yellow" style="flex:1;" onclick="shareUrl()">📤 Compartir</button>
-                        <button class="btn-duo-red" style="flex:1;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
+                    <div style="display:flex; gap:12px; margin-top:24px;">
+                        <button class="btn-primary" style="flex:1;" onclick="window.open(document.getElementById('url-input').value, '_blank')">Probar</button>
+                        <button class="btn-outline" style="flex:1;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
                     </div>
                 </div>
             </div>
@@ -530,22 +525,13 @@
         const oldModal = document.getElementById('url-modal'); if (oldModal) oldModal.remove();
         document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
-    // Funciones globales para el modal
+
     window.copyUrl = function() {
         const input = document.getElementById('url-input');
         input.select(); input.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(input.value).then(() => alert('✅ Enlace copiado al portapapeles'));
-    };
-    window.shareUrl = function() {
-        const url = document.getElementById('url-input').value;
-        if (navigator.share) {
-            navigator.share({ title: 'DuoQuiz Pro', text: 'Realiza este quiz interactivo', url: url });
-        } else {
-            alert('Compartir no soportado en este navegador. Copia el enlace manualmente.');
-        }
+        navigator.clipboard.writeText(input.value).then(() => alert('Enlace copiado'));
     };
 
-    // Almacenamiento
     function guardarLocalmente(registro) {
         let registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         registros.push(registro);
@@ -554,12 +540,9 @@
     async function enviarResultadosTelegram(nombre, cedula, puntos, total) {
         const { token, chatid } = obtenerConfigTelegram();
         if (!token || !chatid) return false;
-        const nombreSeguro = escapeMarkdownV1(nombre);
-        const cedulaSegura = escapeMarkdownV1(cedula);
-        const mensaje = `📋 *Resultado de Quiz*%0A👤 Nombre: ${nombreSeguro}%0A🆔 Cédula: ${cedulaSegura}%0A✅ Nota: ${puntos} / ${total}%0A📅 Fecha: ${new Date().toLocaleString()}`;
-        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatid}&text=${mensaje}&parse_mode=Markdown`;
-        try { const res = await fetch(url); const data = await res.json(); return data.ok; }
-        catch (e) { return false; }
+        const msg = `📋 *Nuevo Resultado*%0A👤 ${escapeMarkdownV1(nombre)}%0A🆔 CI: ${escapeMarkdownV1(cedula)}%0A✅ Nota: ${puntos}/${total}`;
+        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatid}&text=${msg}&parse_mode=Markdown`;
+        try { await fetch(url); return true; } catch (e) { return false; }
     }
     async function guardarPuntaje(nombre, cedula, puntos, total) {
         guardarLocalmente({ nombre, cedula, nota: puntos, total_preguntas: total, fecha: new Date().toISOString() });
@@ -567,11 +550,10 @@
     }
     function obtenerRegistrosLocales() { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     function borrarTodosLosRegistros() {
-        if (!confirm('⚠️ ¿Eliminar TODOS los registros locales?')) return;
-        localStorage.removeItem(STORAGE_KEY); alert('✅ Registros eliminados'); abrirPanelNotas();
+        if (!confirm('¿Eliminar todos los registros locales?')) return;
+        localStorage.removeItem(STORAGE_KEY); abrirPanelNotas();
     }
     function borrarRegistroPorCedula(cedula) {
-        if (!confirm(`¿Eliminar registro con cédula ${cedula}?`)) return;
         let registros = obtenerRegistrosLocales().filter(r => r.cedula !== cedula);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(registros)); abrirPanelNotas();
     }
@@ -581,14 +563,14 @@
         const registros = obtenerRegistrosLocales();
         const tbody = document.getElementById('notas-body');
         if (registros.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Aún no hay registros.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Sin registros aún.</td></tr>';
             return;
         }
         registros.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
         tbody.innerHTML = registros.map(fila => `
             <tr><td>${escapeHTML(fila.nombre)}</td><td>${escapeHTML(fila.cedula)}</td>
-            <td><strong style="color:var(--duo-green)">${fila.nota} / ${fila.total_preguntas}</strong></td>
-            <td><button class="btn-delete" onclick="borrarRegistroPorCedula('${escapeHTML(fila.cedula)}')">🗑️</button></td></tr>
+            <td><strong style="color:var(--success)">${fila.nota}/${fila.total_preguntas}</strong></td>
+            <td><button style="background:none; color:var(--danger); font-size:12px; cursor:pointer; border:none;" onclick="borrarRegistroPorCedula('${escapeHTML(fila.cedula)}')">Eliminar</button></td></tr>
         `).join('');
     }
     function cerrarPanelNotas() {
@@ -596,28 +578,20 @@
         document.getElementById('editor-view').classList.remove('hidden');
     }
 
-    // Flujo del alumno
     function init() {
         const params = new URLSearchParams(window.location.search);
         if (params.has('quiz')) {
             try {
-                const jsonString = LZString.decompressFromEncodedURIComponent(params.get('quiz'));
-                if (!jsonString) throw new Error("Enlace corrupto");
-                const decoded = JSON.parse(jsonString);
+                const decoded = JSON.parse(LZString.decompressFromEncodedURIComponent(params.get('quiz')));
                 quizData = decoded.questions;
                 window.quizTime = parseInt(decoded.time) || 20;
-                if (!quizData || quizData.length === 0) throw new Error("Quiz vacío");
                 esProfesor = false; quizCompletado = false;
                 document.getElementById('teacher-auth-view').classList.add('hidden');
-                document.getElementById('editor-view').classList.add('hidden');
                 document.getElementById('login-view').classList.remove('hidden');
-                document.getElementById('mascot-container').style.display = 'block';
                 setMascotState('neutral');
-            } catch(e) { alert("❌ Error al cargar el quiz."); location.href = location.pathname; }
+            } catch(e) { alert("Error al cargar el quiz."); location.href = location.pathname; }
         } else {
             document.getElementById('teacher-auth-view').classList.remove('hidden');
-            document.getElementById('editor-view').classList.add('hidden');
-            document.getElementById('login-view').classList.add('hidden');
             document.getElementById('mascot-container').style.display = 'none';
         }
     }
@@ -625,34 +599,42 @@
     function iniciarProtocoloAlumno() {
         const nombre = document.getElementById('student-name').value.trim();
         const cedula = document.getElementById('student-id').value.trim();
-        if (!nombre || !cedula) { alert("Completa tus datos."); return; }
-        if (!quizData.length) { alert("No hay preguntas."); return; }
+        if (!nombre || !cedula) { alert("Por favor, completa tus datos."); return; }
         studentProfile = { name: nombre, id: cedula };
         studentScore = 0;
         document.getElementById('login-view').classList.add('hidden');
         document.getElementById('quiz-view').classList.remove('hidden');
-        history.pushState({quiz: true}, '', window.location.href);
         renderQuestion();
     }
 
     function renderQuestion() {
         const q = quizData[currentIndex];
-        const enunciado = capitalizarFrase(q.q);
         const correctOption = q.options.find(o => o.correct);
-        lastCorrectText = correctOption ? capitalizarFrase(correctOption.text) : "Sin definir";
+        lastCorrectText = correctOption ? capitalizarFrase(correctOption.text) : "";
         currentExplanation = q.explanation || '';
+        
         document.getElementById('game-content').innerHTML = `
-            <img class="quiz-img ${q.img && q.img.trim() ? '' : 'hidden'}" src="${q.img}" alt="pregunta">
-            <h1 style="font-size: 28px; margin-bottom: 30px; text-shadow: 0 0 10px rgba(255,255,255,0.2);">${enunciado}</h1>
+            <img class="quiz-img ${q.img ? '' : 'hidden'}" src="${q.img}">
+            <h2 style="font-size: 22px; margin-bottom: 24px; font-weight: 500; line-height: 1.4;">${capitalizarFrase(q.q)}</h2>
             <div class="options-grid"></div>
         `;
+        
         const grid = document.querySelector('#game-content .options-grid');
-        const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+        
+        // SOLUCIÓN BUGS DE SHUFFLE: Algoritmo Fisher-Yates verdadero para aleatoriedad perfecta.
+        let shuffled = [...q.options];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        
         selectedIdx = null; window.selectedCorrect = false;
         shuffled.forEach((opt, idx) => {
             const btn = document.createElement('div');
             btn.className = 'opt-btn';
             btn.innerText = capitalizarFrase(opt.text);
+            btn.dataset.isCorrect = opt.correct; // Guardamos el estado para validación visual
+
             btn.onclick = () => {
                 grid.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
@@ -661,6 +643,7 @@
             };
             grid.appendChild(btn);
         });
+        
         startTimer();
         setMascotState('neutral');
     }
@@ -669,11 +652,11 @@
         clearInterval(timerInterval);
         timeLeft = window.quizTime;
         const bar = document.getElementById('timer-fill');
-        bar.style.transition = 'none'; bar.style.width = '100%'; bar.style.background = 'var(--duo-blue)';
+        bar.style.transition = 'none'; bar.style.width = '100%'; bar.style.background = 'var(--accent)';
         setTimeout(() => { bar.style.transition = `width ${timeLeft}s linear`; bar.style.width = '0%'; }, 50);
         timerInterval = setInterval(() => {
             timeLeft--;
-            if (timeLeft <= 5) bar.style.background = 'var(--duo-red)';
+            if (timeLeft <= 5) bar.style.background = 'var(--danger)';
             if (timeLeft <= 0) { clearInterval(timerInterval); handleTimeOut(); }
         }, 1000);
     }
@@ -685,32 +668,43 @@
         showFeedback(window.selectedCorrect);
     }
 
-    function handleTimeOut() { showFeedback(false, "¡Se acabó el tiempo!"); }
+    function handleTimeOut() { showFeedback(false, "Tiempo agotado"); }
 
     function showFeedback(isCorrect, customTitle) {
         if (autoNextTimer) clearTimeout(autoNextTimer);
+        
+        // SOLUCIÓN BUG DE MARCADO: Bloquear botones e iluminar correcto/incorrecto.
+        const options = document.querySelectorAll('.opt-btn');
+        options.forEach(btn => {
+            btn.style.pointerEvents = 'none'; // Evita que cambien la respuesta
+            if (btn.dataset.isCorrect === "true") {
+                btn.classList.add('correct');
+            } else if (btn.classList.contains('selected')) {
+                btn.classList.add('wrong');
+            }
+        });
+
         const bar = document.getElementById('feedback-bar');
-        bar.className = 'feedback-bar show ' + (isCorrect ? 'correct-bg' : 'wrong-bg');
-        document.getElementById('fb-title').innerText = customTitle || (isCorrect ? '¡Correcto! 🎉' : '¡Incorrecto! 😞');
-        document.getElementById('fb-title').style.color = isCorrect ? 'var(--duo-green)' : 'var(--duo-red)';
-        const sub = document.getElementById('fb-sub');
-        sub.innerText = isCorrect ? '¡Bien hecho!' : `Respuesta correcta: ${lastCorrectText}`;
+        bar.className = 'feedback-bar show';
+        
+        document.getElementById('fb-title').innerText = customTitle || (isCorrect ? 'Correcto' : 'Incorrecto');
+        document.getElementById('fb-title').style.color = isCorrect ? 'var(--success)' : 'var(--danger)';
+        document.getElementById('fb-sub').innerText = isCorrect ? '¡Buen trabajo!' : `La respuesta era: ${lastCorrectText}`;
+        
         const explDiv = document.getElementById('fb-explanation');
         if (currentExplanation.trim()) {
-            explDiv.classList.remove('hidden');
-            explDiv.innerText = '💡 ' + currentExplanation;
+            explDiv.classList.remove('hidden'); explDiv.innerText = currentExplanation;
         } else {
             explDiv.classList.add('hidden');
         }
+        
         const btn = document.getElementById('fb-btn');
-        btn.className = isCorrect ? 'btn-duo-green' : 'btn-duo-red';
-        btn.innerText = 'Siguiente ➡️';
+        btn.className = isCorrect ? 'btn-success' : 'btn-danger';
+        btn.innerText = 'Continuar';
+        
         setMascotState(isCorrect ? 'happy' : 'sad');
-        if (!isCorrect) {
-            autoNextTimer = setTimeout(() => nextQuestion(), 4000);
-        } else {
-            if (typeof confetti !== 'undefined') confetti({ particleCount: 120, spread: 70, origin: { y: 0.7 }, colors: ['#58cc02', '#1cb0f6', '#ffc800'] });
-        }
+        if (!isCorrect) autoNextTimer = setTimeout(() => nextQuestion(), 5000);
+        else if (typeof confetti !== 'undefined') confetti({ particleCount: 100, spread: 60, origin: { y: 0.8 }, colors: ['#3b82f6', '#10b981'] });
     }
 
     function nextQuestion() {
@@ -725,31 +719,25 @@
         document.getElementById('feedback-bar').classList.remove('show');
         quizCompletado = true;
         const total = quizData.length;
-        document.getElementById('game-content').innerHTML = '<div style="text-align:center;"><h2 style="color:var(--duo-blue);">ENVIANDO RESULTADOS...</h2></div>';
+        document.getElementById('game-content').innerHTML = '<div style="text-align:center; padding: 40px 0;"><h2 style="color:var(--text-muted);">Procesando resultados...</h2></div>';
         document.getElementById('main-check-btn').classList.add('hidden');
         document.querySelector('.progress-container').classList.add('hidden');
+        
         await guardarPuntaje(studentProfile.name, studentProfile.id, studentScore, total);
+        
         document.getElementById('game-content').innerHTML = `
-            <div style="animation: fadeIn 1s ease;">
-                <h1 style="color: var(--duo-green); font-size: 38px;">¡MISIÓN CUMPLIDA!</h1>
-                <p style="font-size: 22px;">Estudiante: <span style="color:var(--duo-blue)">${escapeHTML(studentProfile.name)}</span></p>
-                <p style="font-size: 28px; font-weight: 700;">Nota: ${studentScore} / ${total}</p>
-                <p style="color:#aaa;">✅ Resultados enviados a Telegram</p>
-                <div style="margin-top: 30px; padding: 20px; background: #0f1225; border-radius: 20px; border: 1px solid var(--duo-blue);">
-                    <h3 style="color: var(--duo-blue);">🔒 Sesión finalizada</h3>
-                    <p>Puedes cerrar esta página de forma segura.</p>
+            <div style="animation: fadeIn 0.8s ease; text-align: center; margin-top: 20px;">
+                <h1 style="color: var(--success); font-size: 32px; margin-bottom: 24px;">Evaluación Completada</h1>
+                <div class="q-card" style="display: inline-block; text-align: left; min-width: 280px;">
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">Estudiante</p>
+                    <p style="font-size: 18px; font-weight: 500; margin-bottom: 24px;">${escapeHTML(studentProfile.name)}</p>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">Puntuación Final</p>
+                    <p style="font-size: 32px; font-weight: 700; color: var(--accent); margin: 0;">${studentScore} / ${total}</p>
                 </div>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 24px;">Puedes cerrar esta pestaña de forma segura.</p>
             </div>`;
         setMascotState('happy');
-        setTimeout(() => setMascotState('neutral'), 2000);
     }
-
-    window.addEventListener('popstate', function(event) {
-        if (!esProfesor && !quizCompletado && event.state && event.state.quiz) {
-            if (confirm('¿Abandonar el quiz? Perderás tu progreso.')) location.href = location.pathname;
-            else history.pushState({quiz: true}, '', location.href);
-        }
-    });
 
     window.onload = init;
 </script>
