@@ -35,7 +35,7 @@
         }
         
         body {
-            font-family: 'Nunito', sans-serif; /* Fuente redondeada y lúdica (estilo Duolingo) */
+            font-family: 'Nunito', sans-serif;
             background-color: var(--bg-deep);
             background-image: 
                 linear-gradient(rgba(30, 41, 59, 0.5) 1px, transparent 1px),
@@ -364,6 +364,9 @@
     const STORAGE_KEY = 'duoquiz_resultados';
     const TELEGRAM_CONFIG_KEY = 'duoquiz_telegram';
     const TEACHER_PASSWORD = 'profe';
+    
+    // BACKEND PERMANENTE: Firebase Realtime Database
+    const FIREBASE_DB_URL = "https://duoquiz-55f02-default-rtdb.firebaseio.com/quizzes";
 
     function escapeHTML(text) {
         const div = document.createElement('div');
@@ -559,7 +562,8 @@
         document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
     }
 
-    function exportQuiz() {
+    // EXPORTAR: SUBIR EXAMEN A FIREBASE REALTIME DATABASE
+    async function exportQuiz() {
         const cards = document.querySelectorAll('#questions-container .q-card');
         const data = Array.from(cards).map(card => {
             const optionsRows = card.querySelectorAll('.option-edit-row');
@@ -578,27 +582,47 @@
         
         if (data.length === 0) return alert("Carga al menos un módulo válido.");
         const config = { time: document.getElementById('global-timer').value || 20, questions: data };
-        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(config));
-        const url = window.location.origin + window.location.pathname + '?quiz=' + compressed;
         
-        const modalHTML = `
-            <div id="url-modal" class="modal-overlay">
-                <div class="modal-content" style="border-color: var(--neon-pink); box-shadow: 0 0 30px var(--neon-pink-glow);">
-                    <h3 style="color: var(--neon-pink);">Enlace Compilado</h3>
-                    <p style="margin-bottom:16px; color:var(--text-muted); font-size:14px; font-weight:600;">Transmite este código a los nodos estudiantes:</p>
-                    <div style="display:flex; gap:8px; align-items:center;">
-                        <input id="url-input" type="text" readonly value="${escapeHTML(url)}" style="margin:0; flex:1;">
-                        <button class="btn-outline" style="border-color: var(--neon-pink-dark); color: var(--neon-pink); box-shadow: 0 4px 0 var(--neon-pink-dark);" onclick="copyUrl()">Copiar</button>
-                    </div>
-                    <div style="display:flex; gap:12px; margin-top:24px;">
-                        <button class="btn-primary" style="flex:1; background: var(--neon-pink); border-color: var(--neon-pink); box-shadow: 0 6px 0 var(--neon-pink-dark), 0 0 15px var(--neon-pink-glow);" onclick="window.open(document.getElementById('url-input').value, '_blank')">Simular</button>
-                        <button class="btn-outline" style="flex:1;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
+        document.body.style.cursor = 'wait';
+
+        try {
+            const response = await fetch(`${FIREBASE_DB_URL}.json`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error("Fallo de red al escribir en base de datos.");
+
+            const binId = result.name; // Firebase genera automáticamente hashes estables (-OKj23...)
+            const url = window.location.origin + window.location.pathname + '?id=' + binId;
+            
+            const modalHTML = `
+                <div id="url-modal" class="modal-overlay">
+                    <div class="modal-content" style="border-color: var(--neon-pink); box-shadow: 0 0 30px var(--neon-pink-glow);">
+                        <h3 style="color: var(--neon-pink);">Enlace Permanente Listo</h3>
+                        <p style="margin-bottom:16px; color:var(--text-muted); font-size:14px; font-weight:600;">ID único de red asignado en la nube:</p>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input id="url-input" type="text" readonly value="${escapeHTML(url)}" style="margin:0; flex:1;">
+                            <button class="btn-outline" style="border-color: var(--neon-pink-dark); color: var(--neon-pink); box-shadow: 0 4px 0 var(--neon-pink-dark);" onclick="copyUrl()">Copiar</button>
+                        </div>
+                        <div style="display:flex; gap:12px; margin-top:24px;">
+                            <button class="btn-primary" style="flex:1; background: var(--neon-pink); border-color: var(--neon-pink); box-shadow: 0 6px 0 var(--neon-pink-dark), 0 0 15px var(--neon-pink-glow);" onclick="window.open(document.getElementById('url-input').value, '_blank')">Simular</button>
+                            <button class="btn-outline" style="flex:1;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-        const oldModal = document.getElementById('url-modal'); if (oldModal) oldModal.remove();
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
+            `;
+            const oldModal = document.getElementById('url-modal'); if (oldModal) oldModal.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        } catch (error) {
+            console.error(error);
+            alert("Error en la sincronización con Firebase: " + error.message);
+        } finally {
+            document.body.style.cursor = 'default';
+        }
     }
 
     window.copyUrl = function() {
@@ -653,18 +677,42 @@
         document.getElementById('editor-view').classList.remove('hidden');
     }
 
-    function init() {
+    // INICIALIZACIÓN: LEER EXAMEN DESDE FIREBASE
+    async function init() {
         const params = new URLSearchParams(window.location.search);
-        if (params.has('quiz')) {
+        
+        if (params.has('id')) {
+            const binId = params.get('id');
+            document.getElementById('teacher-auth-view').classList.add('hidden');
+            
+            document.body.insertAdjacentHTML('afterbegin', `<div id="loading-overlay" style="position:fixed; inset:0; background:var(--bg-deep); z-index:10000; display:flex; align-items:center; justify-content:center; color:var(--neon-cyan); font-weight:900; letter-spacing:2px;">ESTABLECIENDO ENLACE NEURAL...</div>`);
+            
+            try {
+                const response = await fetch(`${FIREBASE_DB_URL}/${binId}.json`);
+                const decoded = await response.json();
+                
+                if (!decoded) throw new Error("ID inválido o inexistente en los servidores.");
+                
+                quizData = decoded.questions;
+                window.quizTime = parseInt(decoded.time) || 20;
+                
+                document.getElementById('loading-overlay').remove();
+                document.getElementById('login-view').classList.remove('hidden');
+                setMascotState('neutral');
+                
+            } catch (e) {
+                alert("Error de Red: " + e.message);
+                location.href = location.pathname;
+            }
+        } else if (params.has('quiz')) {
+            // Compatibilidad del sistema de compresión viejo por si acaso
             try {
                 const decoded = JSON.parse(LZString.decompressFromEncodedURIComponent(params.get('quiz')));
                 quizData = decoded.questions;
                 window.quizTime = parseInt(decoded.time) || 20;
-                esProfesor = false; quizCompletado = false;
                 document.getElementById('teacher-auth-view').classList.add('hidden');
                 document.getElementById('login-view').classList.remove('hidden');
-                setMascotState('neutral');
-            } catch(e) { alert("Corrupción de datos en el enlace."); location.href = location.pathname; }
+            } catch(e) { alert("Corrupción de datos."); location.href = location.pathname; }
         } else {
             document.getElementById('teacher-auth-view').classList.remove('hidden');
             document.getElementById('mascot-container').style.display = 'none';
