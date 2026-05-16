@@ -43,24 +43,40 @@
             background-size: 30px 30px;
             color: var(--text-light);
             margin: 0;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
             position: relative;
             -webkit-font-smoothing: antialiased;
         }
 
         /* Mascota flotante Kawaii Cyberdog */
         #mascot-container {
-            position: fixed; bottom: 100px; right: 20px;
-            z-index: 1500; pointer-events: none;
+            position: fixed; 
+            bottom: 100px; 
+            right: 20px;
+            z-index: 1500; 
+            pointer-events: none;
             filter: drop-shadow(0 0 15px var(--neon-cyan-glow));
         }
+
         #mascot {
             font-size: 55px;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0.95;
         }
-        #mascot.happy { transform: scale(1.2) translateY(-15px); filter: drop-shadow(0 0 20px var(--neon-lime-glow)); }
-        #mascot.sad { transform: scale(0.9) translateY(10px); opacity: 0.7; filter: drop-shadow(0 0 20px var(--neon-pink-glow)); }
+
+        #mascot.happy { 
+            transform: scale(1.2) translateY(-15px); 
+            filter: drop-shadow(0 0 20px var(--neon-lime-glow)); 
+        }
+
+        #mascot.sad { 
+            transform: scale(0.9) translateY(10px); 
+            opacity: 0.7; 
+            filter: drop-shadow(0 0 20px var(--neon-pink-glow)); 
+        }
 
         .header {
             width: 100%; 
@@ -70,9 +86,12 @@
             box-shadow: 0 0 15px var(--neon-cyan-glow);
             text-align: center;
             margin-bottom: 30px;
-            position: sticky; top: 0; z-index: 1000;
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
             backdrop-filter: blur(12px);
         }
+
         .logo {
             font-weight: 900;
             color: var(--neon-cyan);
@@ -81,18 +100,35 @@
             text-transform: uppercase;
             text-shadow: 0 0 10px var(--neon-cyan-glow);
         }
-        .logo span { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink-glow); }
 
-        .container { width: 90%; max-width: 680px; padding-bottom: 140px; }
-        .hidden { display: none !important; }
+        .logo span { 
+            color: var(--neon-pink); 
+            text-shadow: 0 0 10px var(--neon-pink-glow); 
+        }
+
+        .container { 
+            width: 90%; 
+            max-width: 680px; 
+            padding-bottom: 140px; 
+        }
+
+        .hidden { 
+            display: none !important; 
+        }
 
         /* Estilos de botones 3D Duolingo + Neón */
         button {
-            cursor: pointer; border: none; border-radius: var(--border-radius);
-            font-weight: 800; font-family: 'Nunito', sans-serif;
-            text-transform: uppercase; letter-spacing: 1.5px;
+            cursor: pointer; 
+            border: none; 
+            border-radius: var(--border-radius);
+            font-weight: 800; 
+            font-family: 'Nunito', sans-serif;
+            text-transform: uppercase; 
+            letter-spacing: 1.5px;
             transition: all 0.15s ease;
-            font-size: 16px; padding: 16px 24px; -webkit-appearance: none;
+            font-size: 16px; 
+            padding: 16px 24px; 
+            -webkit-appearance: none;
             position: relative;
             transform: translateY(-4px);
         }
@@ -102,84 +138,145 @@
         }
         
         .btn-primary { 
-            background: var(--neon-cyan); color: #000;
+            background: var(--neon-cyan); 
+            color: #000;
             border: var(--border-width) solid var(--neon-cyan);
             box-shadow: 0 6px 0 var(--neon-cyan-dark), 0 0 15px var(--neon-cyan-glow);
         }
-        .btn-primary:active { box-shadow: 0 0 0 var(--neon-cyan-dark), 0 0 5px var(--neon-cyan-glow); }
+
+        .btn-primary:active { 
+            box-shadow: 0 0 0 var(--neon-cyan-dark), 0 0 5px var(--neon-cyan-glow); 
+        }
 
         .btn-success { 
-            background: var(--neon-lime); color: #000;
+            background: var(--neon-lime); 
+            color: #000;
             border: var(--border-width) solid var(--neon-lime);
             box-shadow: 0 6px 0 var(--neon-lime-dark), 0 0 15px var(--neon-lime-glow);
         }
-        .btn-success:active { box-shadow: 0 0 0 var(--neon-lime-dark), 0 0 5px var(--neon-lime-glow); }
+
+        .btn-success:active { 
+            box-shadow: 0 0 0 var(--neon-lime-dark), 0 0 5px var(--neon-lime-glow); 
+        }
 
         .btn-danger { 
-            background: var(--neon-pink); color: #fff;
+            background: var(--neon-pink); 
+            color: #fff;
             border: var(--border-width) solid var(--neon-pink);
             box-shadow: 0 6px 0 var(--neon-pink-dark), 0 0 15px var(--neon-pink-glow);
         }
-        .btn-danger:active { box-shadow: 0 0 0 var(--neon-pink-dark), 0 0 5px var(--neon-pink-glow); }
+
+        .btn-danger:active { 
+            box-shadow: 0 0 0 var(--neon-pink-dark), 0 0 5px var(--neon-pink-glow); 
+        }
 
         .btn-outline { 
-            background: var(--bg-grid); color: var(--neon-cyan); 
+            background: var(--bg-grid); 
+            color: var(--neon-cyan); 
             border: var(--border-width) solid var(--neon-cyan-dark);
             box-shadow: 0 4px 0 var(--neon-cyan-dark);
         }
-        .btn-outline:active { box-shadow: 0 0 0 var(--neon-cyan-dark); transform: translateY(0); margin-top: -4px; margin-bottom: 4px; }
+
+        .btn-outline:active { 
+            box-shadow: 0 0 0 var(--neon-cyan-dark); 
+            transform: translateY(0); 
+            margin-top: -4px; 
+            margin-bottom: 4px; 
+        }
 
         .q-card {
             background: var(--card-bg); 
             border: var(--border-width) solid #334155;
             border-radius: var(--border-radius); 
-            padding: 28px; margin-bottom: 24px;
+            padding: 28px; 
+            margin-bottom: 24px;
             animation: fadeIn 0.4s ease-out;
             transition: border-color 0.3s, box-shadow 0.3s;
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
+
         .q-card:hover { 
             border-color: var(--neon-cyan-dark); 
             box-shadow: 0 8px 25px var(--neon-cyan-glow);
         }
 
-        input, textarea {
-            width: 100%; padding: 16px; margin: 8px 0 16px;
+        input[type="text"], 
+        input[type="number"], 
+        input[type="password"], 
+        textarea {
+            width: 100%; 
+            padding: 16px; 
+            margin: 8px 0 16px;
             background: rgba(15, 23, 42, 0.7); 
             border: var(--border-width) solid #334155;
-            border-radius: 16px; font-family: inherit; font-weight: 600;
+            border-radius: 16px; 
+            font-family: inherit; 
+            font-weight: 600;
             color: var(--text-light);
-            box-sizing: border-box; font-size: 16px; transition: 0.2s;
-            -webkit-appearance: none; resize: vertical;
+            box-sizing: border-box; 
+            font-size: 16px; 
+            transition: 0.2s;
+            -webkit-appearance: none; 
+            resize: vertical;
         }
-        input:focus, textarea:focus {
-            border-color: var(--neon-cyan); outline: none;
+
+        input:focus, 
+        textarea:focus {
+            border-color: var(--neon-cyan); 
+            outline: none;
             box-shadow: 0 0 15px var(--neon-cyan-glow);
         }
 
-        .option-edit-row { display: flex; gap: 12px; align-items: center; margin-bottom: 4px; }
-        .is-correct-radio { width: 24px; height: 24px; cursor: pointer; accent-color: var(--neon-lime); margin: 0; }
+        .option-edit-row { 
+            display: flex; 
+            gap: 12px; 
+            align-items: center; 
+            margin-bottom: 4px; 
+        }
+
+        .is-correct-radio { 
+            width: 24px; 
+            height: 24px; 
+            cursor: pointer; 
+            accent-color: var(--neon-lime); 
+            margin: 0; 
+        }
         
-        /* Barra de Progreso Chunk y Neón */
+        /* Barra de Progreso */
         .progress-container { 
-            width: 100%; height: 16px; background: #334155; 
-            border-radius: 16px; margin: 0 0 20px; overflow: hidden;
+            width: 100%; 
+            height: 16px; 
+            background: #334155; 
+            border-radius: 16px; 
+            margin: 0 0 20px; 
+            overflow: hidden;
             border: var(--border-width) solid #1e293b;
         }
+
         #timer-fill { 
-            height: 100%; background: var(--neon-cyan); width: 100%; 
-            transition: width 1s linear; border-radius: 16px;
+            height: 100%; 
+            background: var(--neon-cyan); 
+            width: 100%; 
+            transition: width 1s linear; 
+            border-radius: 16px;
             box-shadow: 0 0 10px var(--neon-cyan);
         }
 
         .quiz-img { 
-            max-width: 100%; max-height: 240px; object-fit: cover; 
-            border-radius: 16px; margin-bottom: 24px; 
+            max-width: 100%; 
+            max-height: 240px; 
+            object-fit: cover; 
+            border-radius: 16px; 
+            margin-bottom: 24px; 
             border: var(--border-width) solid var(--neon-cyan-dark); 
             box-shadow: 0 0 15px var(--neon-cyan-glow);
         }
 
-        .options-grid { display: flex; flex-direction: column; gap: 16px; }
+        .options-grid { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+        }
         
         /* Opciones Estilo Duolingo */
         .opt-btn {
@@ -188,30 +285,45 @@
             color: var(--text-light); 
             border-radius: var(--border-radius); 
             padding: 18px 24px;
-            font-size: 18px; text-align: left; font-weight: 700;
-            transition: all 0.2s; cursor: pointer;
-            -webkit-tap-highlight-color: transparent; user-select: none;
-            display: flex; justify-content: space-between; align-items: center;
+            font-size: 18px; 
+            text-align: left; 
+            font-weight: 700;
+            transition: all 0.2s; 
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
             box-shadow: 0 4px 0 #334155;
             position: relative;
             transform: translateY(-2px);
         }
-        .opt-btn:hover { border-color: var(--neon-cyan-dark); background: rgba(0, 240, 255, 0.05); }
-        .opt-btn:active { box-shadow: 0 0 0 #334155; transform: translateY(2px); }
+
+        .opt-btn:hover { 
+            border-color: var(--neon-cyan-dark); 
+            background: rgba(0, 240, 255, 0.05); 
+        }
+
+        .opt-btn:active { 
+            box-shadow: 0 0 0 #334155; 
+            transform: translateY(2px); 
+        }
         
-        /* Estados de las opciones */
         .opt-btn.selected {
             border-color: var(--neon-cyan); 
             background: rgba(0, 240, 255, 0.1);
             color: var(--neon-cyan);
             box-shadow: 0 4px 0 var(--neon-cyan-dark), 0 0 15px var(--neon-cyan-glow);
         }
+
         .opt-btn.correct {
             border-color: var(--neon-lime);
             background: rgba(204, 255, 0, 0.1);
             color: var(--neon-lime);
             box-shadow: 0 4px 0 var(--neon-lime-dark), 0 0 15px var(--neon-lime-glow);
         }
+
         .opt-btn.wrong {
             border-color: var(--neon-pink);
             background: rgba(255, 42, 133, 0.1);
@@ -220,65 +332,190 @@
             box-shadow: 0 4px 0 var(--neon-pink-dark), 0 0 15px var(--neon-pink-glow);
         }
 
+        /* Barra de Feedback Inferior */
         .feedback-bar {
-            position: fixed; bottom: 0; left: 0; right: 0; padding: 30px 20px;
-            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.18,0.89,0.32,1.28);
-            display: flex; justify-content: center; z-index: 2000; 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            padding: 30px 20px;
+            transform: translateY(100%); 
+            transition: transform 0.4s cubic-bezier(0.18,0.89,0.32,1.28);
+            display: flex; 
+            justify-content: center; 
+            z-index: 2000; 
             background: var(--bg-deep);
             border-top: 4px solid #334155;
         }
-        .feedback-bar.show { transform: translateY(0); }
-        .feedback-bar.show.correct-bg { border-color: var(--neon-lime); box-shadow: 0 -10px 30px var(--neon-lime-glow); }
-        .feedback-bar.show.wrong-bg { border-color: var(--neon-pink); box-shadow: 0 -10px 30px var(--neon-pink-glow); }
 
-        .feedback-content { width: 100%; max-width: 680px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-        .feedback-text h2 { margin: 0; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-        .feedback-text p { margin: 8px 0 0; font-size: 16px; font-weight: 600; color: var(--text-light); }
-        .explanation-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; margin-top: 12px; font-size: 15px; color: var(--text-light); border: 1px dashed var(--text-muted); }
+        .feedback-bar.show { 
+            transform: translateY(0); 
+        }
 
-        .notas-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 15px; font-weight: 600; }
-        .notas-table th, .notas-table td { padding: 16px; border-bottom: 1px solid #334155; text-align: left; }
-        .notas-table th { color: var(--neon-cyan); text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
+        .feedback-bar.show.correct-bg { 
+            border-color: var(--neon-lime); 
+            box-shadow: 0 -10px 30px var(--neon-lime-glow); 
+        }
+
+        .feedback-bar.show.wrong-bg { 
+            border-color: var(--neon-pink); 
+            box-shadow: 0 -10px 30px var(--neon-pink-glow); 
+        }
+
+        .feedback-content { 
+            width: 100%; 
+            max-width: 680px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 20px; 
+        }
+
+        .feedback-text h2 { 
+            margin: 0; 
+            font-size: 24px; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+        }
+
+        .feedback-text p { 
+            margin: 8px 0 0; 
+            font-size: 16px; 
+            font-weight: 600; 
+            color: var(--text-light); 
+        }
+
+        .explanation-box { 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 12px; 
+            padding: 16px; 
+            margin-top: 12px; 
+            font-size: 15px; 
+            color: var(--text-light); 
+            border: 1px dashed var(--text-muted); 
+        }
+
+        .notas-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+            font-size: 15px; 
+            font-weight: 600; 
+        }
+
+        .notas-table th, .notas-table td { 
+            padding: 16px; 
+            border-bottom: 1px solid #334155; 
+            text-align: left; 
+        }
+
+        .notas-table th { 
+            color: var(--neon-cyan); 
+            text-transform: uppercase; 
+            font-size: 13px; 
+            letter-spacing: 1px; 
+        }
         
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-        .modal-content { background: var(--card-bg); border: var(--border-width) solid var(--neon-cyan); border-radius: var(--border-radius); padding: 32px; max-width: 500px; width: 90%; box-shadow: 0 0 30px var(--neon-cyan-glow); }
-        
-        label { font-size: 14px; color: var(--neon-cyan); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; display: block; }
-        h1, h2, h3 { margin-top: 0; font-weight: 900; }
+        .modal-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(15, 23, 42, 0.95); 
+            z-index: 9999; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            backdrop-filter: blur(8px); 
+        }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-content { 
+            background: var(--card-bg); 
+            border: var(--border-width) solid var(--neon-cyan); 
+            border-radius: var(--border-radius); 
+            padding: 32px; 
+            max-width: 500px; 
+            width: 90%; 
+            box-shadow: 0 0 30px var(--neon-cyan-glow); 
+        }
+        
+        label { 
+            font-size: 14px; 
+            color: var(--neon-cyan); 
+            text-transform: uppercase; 
+            font-weight: 800; 
+            letter-spacing: 1px; 
+            margin-bottom: 8px; 
+            display: block; 
+        }
+
+        h1, h2, h3 { 
+            margin-top: 0; 
+            font-weight: 900; 
+        }
+
+        /* Animación de la cuenta regresiva */
+        #countdown-number {
+            font-size: 150px; 
+            color: var(--neon-lime); 
+            text-shadow: 0 0 40px var(--neon-lime-glow); 
+            font-weight: 900;
+            transition: transform 0.2s;
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(15px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
         @media (max-width: 600px) {
-            .feedback-content { flex-direction: column; text-align: left; align-items: stretch; }
-            .feedback-content button { width: 100%; }
-            #mascot-container { bottom: 120px; right: 10px; }
-            #mascot { font-size: 45px; }
+            .feedback-content { 
+                flex-direction: column; 
+                text-align: left; 
+                align-items: stretch; 
+            }
+            .feedback-content button { 
+                width: 100%; 
+            }
+            #mascot-container { 
+                bottom: 120px; 
+                right: 10px; 
+            }
+            #mascot { 
+                font-size: 45px; 
+            }
         }
     </style>
 </head>
 <body>
+
 <div class="header">
     <div class="logo">Cyber<span>Doggo</span></div>
 </div>
 
-<div id="mascot-container"><div id="mascot">🐶🕶️</div></div>
+<div id="mascot-container">
+    <div id="mascot">🐶🕶️</div>
+</div>
 
 <div id="teacher-auth-view" class="container">
     <div class="q-card" style="text-align: center; max-width: 400px; margin: 0 auto;">
         <h2 style="color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan-glow);">SYS_ADMIN</h2>
         <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 15px; font-weight: 600;">Ingresa clave de acceso.</p>
+        
         <input type="password" id="teacher-password" placeholder="***">
         <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="verificarProfesor()">Conectar</button>
+        
         <p id="auth-error" style="color: var(--neon-pink); font-size: 14px; font-weight: bold; margin-top: 16px; display: none; text-shadow: 0 0 5px var(--neon-pink-glow);">>> ACCESO DENEGADO <<</p>
     </div>
 </div>
 
 <div id="editor-view" class="container hidden">
-    <button class="btn-outline" style="width:100%; margin-bottom:24px;" onclick="abrirPanelNotas()">Base de Datos: Notas</button>
+    <button class="btn-outline" style="width:100%; margin-bottom:24px;" onclick="abrirPanelNotas()">Base de Datos: Notas y Justificaciones</button>
     
     <div class="q-card">
         <h3 style="color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink-glow);">[ Configuración Central ]</h3>
-        <label>Segundos por iteración:</label>
-        <input type="number" id="global-timer" value="20">
+        
+        <label>Segundos por iteración (Global):</label>
+        <input type="number" id="global-timer" value="30">
         
         <label style="margin-top:16px;">Token de enlace Telegram:</label>
         <input type="text" id="tg-token" placeholder="123456:ABCdef...">
@@ -304,8 +541,8 @@
 <div id="import-modal" class="modal-overlay hidden">
     <div class="modal-content">
         <h3 style="color: var(--neon-cyan);">Inyectar Datos</h3>
-        <p style="font-size:14px; color:var(--text-muted); font-weight:600;">Formato raw esperado. Asterisco (*) marca el nodo correcto.</p>
         <textarea id="import-text" rows="6" placeholder="¿Capital del sector 7?&#10;*Neo-Tokyo&#10;Midgar&#10;Zion"></textarea>
+        
         <div style="display:flex; gap:12px; margin-top:16px;">
             <button class="btn-outline" style="flex:1;" onclick="document.getElementById('import-modal').classList.add('hidden')">Abortar</button>
             <button class="btn-primary" style="flex:2;" onclick="importarQuiz()">Procesar</button>
@@ -319,13 +556,30 @@
             <h2 style="color: var(--neon-lime); text-shadow: 0 0 10px var(--neon-lime-glow);">Registros Locales</h2>
             <button class="btn-danger" onclick="borrarTodosLosRegistros()" style="padding: 10px 16px; font-size: 13px;">Purgar BD</button>
         </div>
+        
         <div style="overflow-x: auto;">
             <table class="notas-table" id="tabla-resultados">
-                <thead><tr><th>Usuario</th><th>ID Red</th><th>Puntuación</th><th></th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Puntuación</th>
+                        <th>Justificaciones</th>
+                        <th></th>
+                    </tr>
+                </thead>
                 <tbody id="notas-body"></tbody>
             </table>
         </div>
+        
         <button class="btn-outline" style="width:100%; margin-top:24px;" onclick="cerrarPanelNotas()">Retornar al Core</button>
+    </div>
+</div>
+
+<div id="justifications-modal" class="modal-overlay hidden">
+    <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+        <h3 style="color: var(--neon-cyan);">Justificaciones del Alumno</h3>
+        <div id="justifications-content" style="color: var(--text-light); font-size: 15px; margin-bottom: 20px;"></div>
+        <button class="btn-outline" style="width: 100%;" onclick="document.getElementById('justifications-modal').classList.add('hidden')">Cerrar Visor</button>
     </div>
 </div>
 
@@ -333,9 +587,18 @@
     <div class="q-card" style="text-align: center; max-width: 400px; margin: 0 auto;">
         <h2 style="color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan-glow);">Identidad Requerida</h2>
         <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 15px; font-weight: 600;">Ingresa tu alias en la red.</p>
+        
         <input type="text" id="student-name" placeholder="Alias / Nombre" required>
         <input type="number" id="student-id" placeholder="Código de Identificación" required>
+        
         <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="iniciarProtocoloAlumno()">Ejecutar</button>
+    </div>
+</div>
+
+<div id="countdown-overlay" class="modal-overlay hidden">
+    <div style="text-align: center;">
+        <h2 style="color: var(--text-light); letter-spacing: 2px; text-transform: uppercase;">Iniciando Simulación en...</h2>
+        <div id="countdown-number">5</div>
     </div>
 </div>
 
@@ -344,8 +607,13 @@
         <span>OPERADOR: <span id="user-display" style="color: var(--neon-cyan);"></span></span>
         <span onclick="cerrarSesionAlumno()" style="color: var(--neon-pink); cursor: pointer; text-transform: uppercase;">[ Cerrar Sesión ]</span>
     </div>
-    <div class="progress-container"><div id="timer-fill"></div></div>
+    
+    <div class="progress-container">
+        <div id="timer-fill"></div>
+    </div>
+    
     <div id="game-content"></div>
+    
     <div style="text-align: center; margin-top: 40px;">
         <button id="main-check-btn" class="btn-primary" style="width: 100%; padding: 20px; font-size: 18px;" onclick="validateSelection()">Verificar</button>
     </div>
@@ -363,100 +631,129 @@
 </div>
 
 <script>
+    // Configuración Inicial Constante
     const DEFAULT_TELEGRAM_TOKEN = '8776895277:AAEu6w2UAU-aBB-IMrmm_zo0J8jzk2Kicis';
     const DEFAULT_TELEGRAM_CHATID = '6815312132';
     const STORAGE_KEY = 'duoquiz_resultados';
     const TELEGRAM_CONFIG_KEY = 'duoquiz_telegram';
     const TEACHER_PASSWORD = 'profe';
-    
-    // LLAVE DE MEMORIA PARA ALUMNOS
     const PROFILE_STORAGE_KEY = 'duoquiz_alumno_perfil';
     
     // BACKEND PERMANENTE: Firebase Realtime Database
     const FIREBASE_DB_URL = "https://duoquiz-55f02-default-rtdb.firebaseio.com/quizzes";
 
-    function escapeHTML(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+    // Utilidades para evitar Inyección de Código (XSS)
+    function escapeHTML(text) { 
+        const div = document.createElement('div'); 
+        div.textContent = text; 
+        return div.innerHTML; 
     }
-    function escapeMarkdownV1(text) {
-        if (!text) return text;
-        return text.replace(/([_*`])/g, '\\$1');
+    
+    function escapeMarkdownV1(text) { 
+        if (!text) return text; 
+        return text.replace(/([_*`])/g, '\\$1'); 
     }
-    function capitalizarFrase(texto) {
-        if (!texto || typeof texto !== 'string') return texto;
-        texto = texto.trim();
-        return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+    
+    function capitalizarFrase(texto) { 
+        if (!texto || typeof texto !== 'string') return texto; 
+        texto = texto.trim(); 
+        return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase(); 
     }
 
+    // Variables de Estado Global
     let quizData = [];
     let currentIndex = 0;
     let selectedIdx = null;
-    let timerInterval, autoNextTimer = null;
+    let timerInterval = null;
+    let autoNextTimer = null;
     let timeLeft;
     let studentProfile = { name: '', id: '' };
     let studentScore = 0;
+    let studentJustifications = []; // Arreglo para guardar las justificaciones
     let esProfesor = false;
     let quizCompletado = false;
     let lastCorrectText = "";
     let currentExplanation = "";
 
+    // Controlador de la Mascota
     function setMascotState(state) {
         const mascot = document.getElementById('mascot');
         if (!mascot) return;
+        
         mascot.classList.remove('happy', 'sad');
-        if (state === 'happy') {
-            mascot.textContent = '🐶✨';
-            mascot.classList.add('happy');
-        } else if (state === 'sad') {
-            mascot.textContent = '🐶💧';
-            mascot.classList.add('sad');
-        } else {
-            mascot.textContent = '🐶🕶️';
+        if (state === 'happy') { 
+            mascot.textContent = '🐶✨'; 
+            mascot.classList.add('happy'); 
+        } else if (state === 'sad') { 
+            mascot.textContent = '🐶💧'; 
+            mascot.classList.add('sad'); 
+        } else { 
+            mascot.textContent = '🐶🕶️'; 
         }
     }
 
+    // Funciones de Configuración de Telegram
     function obtenerConfigTelegram() {
         const saved = localStorage.getItem(TELEGRAM_CONFIG_KEY);
-        if (saved) { try { return JSON.parse(saved); } catch(e) {} }
+        if (saved) { 
+            try { 
+                return JSON.parse(saved); 
+            } catch(e) {} 
+        }
         return { token: DEFAULT_TELEGRAM_TOKEN, chatid: DEFAULT_TELEGRAM_CHATID };
     }
+
     function guardarConfigTelegram() {
         const token = document.getElementById('tg-token').value.trim();
         const chatid = document.getElementById('tg-chatid').value.trim();
-        if (!token || !chatid) { alert('Completa ambos campos de Telegram.'); return; }
-        localStorage.setItem(TELEGRAM_CONFIG_KEY, JSON.stringify({ token, chatid }));
-        alert('Configuración guardada.');
+        
+        if (!token || !chatid) { 
+            alert('Completa ambos campos de configuración.'); 
+            return; 
+        }
+        
+        localStorage.setItem(TELEGRAM_CONFIG_KEY, JSON.stringify({ token, chatid })); 
+        alert('Configuración guardada exitosamente.');
     }
+
     async function probarTelegram() {
         const { token, chatid } = obtenerConfigTelegram();
         if (!token || !chatid) return;
+        
         const msg = encodeURIComponent('Prueba de sistema: Conexión exitosa.');
-        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatid}&text=${msg}`;
-        try { await fetch(url); alert('Mensaje enviado.'); } catch (err) { alert('Error: ' + err.message); }
-    }
-    function cargarConfigTelegramEnForm() {
-        const { token, chatid } = obtenerConfigTelegram();
-        document.getElementById('tg-token').value = token || '';
-        document.getElementById('tg-chatid').value = chatid || '';
+        try { 
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatid}&text=${msg}`); 
+            alert('Mensaje de prueba enviado a Telegram.'); 
+        } catch (err) { 
+            alert('Error al enviar mensaje: ' + err.message); 
+        }
     }
 
+    // Funciones de Login del Profesor
     function verificarProfesor() {
-        const pwd = document.getElementById('teacher-password').value;
-        if (pwd === TEACHER_PASSWORD) {
+        if (document.getElementById('teacher-password').value === TEACHER_PASSWORD) {
             document.getElementById('teacher-auth-view').classList.add('hidden');
             document.getElementById('editor-view').classList.remove('hidden');
             esProfesor = true;
-            cargarConfigTelegramEnForm();
-            if (document.getElementById('questions-container').children.length === 0) addQuestion();
+            
+            const { token, chatid } = obtenerConfigTelegram();
+            document.getElementById('tg-token').value = token || ''; 
+            document.getElementById('tg-chatid').value = chatid || '';
+            
+            // Si no hay preguntas creadas, genera una por defecto
+            if (document.getElementById('questions-container').children.length === 0) {
+                addQuestion();
+            }
         } else {
-            document.getElementById('auth-error').style.display = 'block';
+            document.getElementById('auth-error').style.display = 'block'; 
             document.getElementById('teacher-password').value = '';
         }
     }
 
-    function generarIdPregunta() { return 'q' + Date.now() + Math.random().toString(36).substr(2, 5); }
+    // Funciones del Editor de Preguntas
+    function generarIdPregunta() { 
+        return 'q' + Date.now() + Math.random().toString(36).substr(2, 5); 
+    }
 
     function addQuestion() {
         const id = generarIdPregunta();
@@ -464,10 +761,18 @@
             <div class="q-card" id="${id}">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <span style="color: var(--neon-cyan); font-size: 14px; font-weight: 800; text-transform: uppercase;">Módulo Estructural</span>
-                    <button onclick="document.getElementById('${id}').remove()" style="background:none; border:none; color:var(--neon-pink); font-weight:bold; cursor:pointer; font-size:12px; text-transform:uppercase;">[ Eliminar ]</button>
+                    <button onclick="document.getElementById('${id}').remove()" style="background:none; border:none; color:var(--neon-pink); font-weight:bold; cursor:pointer; font-size:12px;">[ Eliminar ]</button>
                 </div>
+                
                 <input type="text" class="q-text" placeholder="Ingresa la consulta principal...">
+                
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; border: 1px solid #334155;">
+                    <input type="checkbox" class="q-require-justification" style="width: 20px; height: 20px; margin: 0; accent-color: var(--neon-pink);">
+                    <label style="margin: 0; color: var(--neon-pink); text-transform: none; font-size: 15px;">Pedir que el estudiante justifique su respuesta en esta pregunta</label>
+                </div>
+
                 <input type="text" class="q-img" placeholder="URL de imagen (opcional)">
+                
                 <div class="options-area">
                     <div class="option-edit-row">
                         <input type="radio" name="${id}" class="is-correct-radio" checked>
@@ -480,72 +785,94 @@
                         <button onclick="this.parentElement.remove()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:24px;">×</button>
                     </div>
                 </div>
+                
                 <button class="btn-outline" onclick="addOptionToQuestion('${id}')" style="margin-top:12px; font-size:14px; padding:10px 18px;">+ Nodo de Opción</button>
                 <textarea class="q-explanation" placeholder="Metadatos de explicación (opcional)" style="margin-top:16px; height:80px;"></textarea>
-            </div>
-        `;
+            </div>`;
+            
         document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
     }
 
     function addOptionToQuestion(qId) {
-        const container = document.querySelector(`#${qId} .options-area`);
-        if (!container) return;
-        const html = `
+        const rowHtml = `
             <div class="option-edit-row">
                 <input type="radio" name="${qId}" class="is-correct-radio">
                 <input type="text" class="opt-text" placeholder="Nodo adicional">
                 <button onclick="this.parentElement.remove()" style="background:none; border:none; color:var(--text-muted); font-size:24px; cursor:pointer;">×</button>
-            </div>
-        `;
-        container.insertAdjacentHTML('beforeend', html);
+            </div>`;
+            
+        document.querySelector(`#${qId} .options-area`).insertAdjacentHTML('beforeend', rowHtml);
     }
 
-    function abrirImportador() {
-        document.getElementById('import-modal').classList.remove('hidden');
-        document.getElementById('import-text').focus();
+    // Funciones del Importador Rápido
+    function abrirImportador() { 
+        document.getElementById('import-modal').classList.remove('hidden'); 
+        document.getElementById('import-text').focus(); 
     }
+
     function importarQuiz() {
         const texto = document.getElementById('import-text').value.trim();
         if (!texto) return;
+        
         const usaFormatoRespuesta = /Respuesta\s*:\s*[a-dA-D]/i.test(texto);
-        let bloques = usaFormatoRespuesta ? texto.split(/\n(?=\d+\. )/).filter(b => b.trim() !== '') : texto.split(/\n\s*\n/).filter(b => b.trim() !== '');
+        let bloques = usaFormatoRespuesta 
+            ? texto.split(/\n(?=\d+\. )/).filter(b => b.trim() !== '') 
+            : texto.split(/\n\s*\n/).filter(b => b.trim() !== '');
         
         document.getElementById('questions-container').innerHTML = '';
+        
         bloques.forEach(bloque => {
             const lineas = bloque.split('\n').map(l => l.trim()).filter(l => l !== '');
             if (lineas.length < 2) return;
             try {
-                if (usaFormatoRespuesta) procesarBloqueFormatoRespuesta(lineas);
-                else procesarBloqueFormatoAsterisco(lineas);
+                if (usaFormatoRespuesta) {
+                    procesarBloqueFormatoRespuesta(lineas);
+                } else {
+                    procesarBloqueFormatoAsterisco(lineas);
+                }
             } catch (e) {}
         });
+        
         document.getElementById('import-modal').classList.add('hidden');
         document.getElementById('import-text').value = '';
     }
+
     function procesarBloqueFormatoRespuesta(lineas) {
         let primera = lineas.shift();
         const pregunta = primera.replace(/^\d+\.\s*/, '');
         let idxRespuesta = lineas.findIndex(l => /^Respuesta\s*:\s*[a-dA-D]/i.test(l));
+        
         const lineaRespuesta = lineas.splice(idxRespuesta, 1)[0];
         const letraCorrecta = lineaRespuesta.match(/Respuesta\s*:\s*([a-dA-D])/i)[1].toLowerCase();
+        
         const opciones = lineas.map(l => {
             const match = l.match(/^([a-d])\)\s*(.+)/i);
             return { text: match[2], correct: match[1].toLowerCase() === letraCorrecta };
         });
+        
         if (!opciones.some(o => o.correct)) opciones[0].correct = true;
+        
         crearPreguntaConDatos(pregunta, '', opciones, '');
     }
+
     function procesarBloqueFormatoAsterisco(lineas) {
         const pregunta = lineas.shift();
         const opciones = lineas.map(linea => {
             const esCorrecta = linea.startsWith('*');
-            return { text: esCorrecta ? linea.substring(1).trim() : linea.trim(), correct: esCorrecta };
+            return { 
+                text: esCorrecta ? linea.substring(1).trim() : linea.trim(), 
+                correct: esCorrecta 
+            };
         });
+        
         if (!opciones.some(o => o.correct)) opciones[0].correct = true;
+        
         crearPreguntaConDatos(pregunta, '', opciones, '');
     }
+
     function crearPreguntaConDatos(enunciado, img, opciones, explicacion = '') {
         const id = generarIdPregunta();
+        
         const opcionesHTML = opciones.map((op) => `
             <div class="option-edit-row">
                 <input type="radio" name="${id}" class="is-correct-radio" ${op.correct ? 'checked' : ''}>
@@ -553,186 +880,288 @@
                 <button onclick="this.parentElement.remove()" style="background:none; border:none; color:var(--text-muted); font-size:24px; cursor:pointer;">×</button>
             </div>
         `).join('');
+        
         const html = `
             <div class="q-card" id="${id}">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <span style="color: var(--neon-cyan); font-size: 14px; font-weight: 800; text-transform: uppercase;">Módulo Estructural</span>
                     <button onclick="document.getElementById('${id}').remove()" style="background:none; border:none; color:var(--neon-pink); font-weight:bold; cursor:pointer; font-size:12px; text-transform:uppercase;">[ Eliminar ]</button>
                 </div>
+                
                 <input type="text" class="q-text" value="${escapeHTML(enunciado)}">
+                
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; border: 1px solid #334155;">
+                    <input type="checkbox" class="q-require-justification" style="width: 20px; height: 20px; margin: 0; accent-color: var(--neon-pink);">
+                    <label style="margin: 0; color: var(--neon-pink); text-transform: none; font-size: 15px;">Pedir que el estudiante justifique su respuesta en esta pregunta</label>
+                </div>
+
                 <input type="text" class="q-img" value="${escapeHTML(img)}" placeholder="URL de imagen (opcional)">
+                
                 <div class="options-area">${opcionesHTML}</div>
+                
                 <button class="btn-outline" onclick="addOptionToQuestion('${id}')" style="margin-top:12px; font-size:14px; padding:10px 18px;">+ Nodo de Opción</button>
                 <textarea class="q-explanation" placeholder="Metadatos de explicación (opcional)">${escapeHTML(explicacion)}</textarea>
             </div>
         `;
+        
         document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
     }
 
+    // Funciones de Base de Datos y Exportación (Firebase)
     async function exportQuiz() {
         const cards = document.querySelectorAll('#questions-container .q-card');
+        
         const data = Array.from(cards).map(card => {
-            const optionsRows = card.querySelectorAll('.option-edit-row');
-            const options = Array.from(optionsRows).map(row => ({
-                text: row.querySelector('.opt-text').value,
+            const options = Array.from(card.querySelectorAll('.option-edit-row')).map(row => ({
+                text: row.querySelector('.opt-text').value, 
                 correct: row.querySelector('.is-correct-radio').checked
             })).filter(o => o.text.trim() !== "");
-            const explanationEl = card.querySelector('.q-explanation');
+            
+            // Verificamos si el profesor activó la justificación
+            const reqJustCheck = card.querySelector('.q-require-justification');
+            
             return {
                 q: card.querySelector('.q-text').value,
                 img: card.querySelector('.q-img').value,
                 options,
-                explanation: explanationEl ? explanationEl.value : ''
+                explanation: card.querySelector('.q-explanation') ? card.querySelector('.q-explanation').value : '',
+                requireJustification: reqJustCheck ? reqJustCheck.checked : false
             };
         }).filter(q => q.q.trim() !== "" && q.options.length > 0);
         
-        if (data.length === 0) return alert("Carga al menos un módulo válido.");
-        const config = { time: document.getElementById('global-timer').value || 20, questions: data };
+        if (data.length === 0) {
+            return alert("Carga al menos un módulo válido antes de compilar.");
+        }
+        
+        const config = { 
+            time: document.getElementById('global-timer').value || 30, 
+            questions: data 
+        };
         
         document.body.style.cursor = 'wait';
-
+        
         try {
-            const response = await fetch(`${FIREBASE_DB_URL}.json`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(config)
+            // Mandamos los datos a Firebase
+            const response = await fetch(`${FIREBASE_DB_URL}.json`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(config) 
             });
-
-            const result = await response.json();
-            if (!response.ok) throw new Error("Fallo de red al escribir en base de datos.");
-
-            const binId = result.name;
-            const url = window.location.origin + window.location.pathname + '?id=' + binId;
             
+            const result = await response.json();
+            const url = window.location.origin + window.location.pathname + '?id=' + result.name;
+            
+            // Creamos el Modal que muestra el enlace final
             const modalHTML = `
                 <div id="url-modal" class="modal-overlay">
                     <div class="modal-content" style="border-color: var(--neon-pink); box-shadow: 0 0 30px var(--neon-pink-glow);">
                         <h3 style="color: var(--neon-pink);">Enlace Permanente Listo</h3>
-                        <p style="margin-bottom:16px; color:var(--text-muted); font-size:14px; font-weight:600;">ID único de red asignado en la nube:</p>
-                        <div style="display:flex; gap:8px; align-items:center;">
+                        
+                        <div style="display:flex; gap:8px; align-items:center; margin-bottom: 24px;">
                             <input id="url-input" type="text" readonly value="${escapeHTML(url)}" style="margin:0; flex:1;">
-                            <button class="btn-outline" style="border-color: var(--neon-pink-dark); color: var(--neon-pink); box-shadow: 0 4px 0 var(--neon-pink-dark);" onclick="copyUrl()">Copiar</button>
+                            <button class="btn-outline" style="border-color: var(--neon-pink-dark); color: var(--neon-pink);" onclick="copyUrl()">Copiar</button>
                         </div>
-                        <div style="display:flex; gap:12px; margin-top:24px;">
-                            <button class="btn-primary" style="flex:1; background: var(--neon-pink); border-color: var(--neon-pink); box-shadow: 0 6px 0 var(--neon-pink-dark), 0 0 15px var(--neon-pink-glow);" onclick="window.open(document.getElementById('url-input').value, '_blank')">Simular</button>
-                            <button class="btn-outline" style="flex:1;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
-                        </div>
+                        
+                        <button class="btn-outline" style="width: 100%;" onclick="document.getElementById('url-modal').remove()">Cerrar</button>
                     </div>
-                </div>
-            `;
-            const oldModal = document.getElementById('url-modal'); if (oldModal) oldModal.remove();
+                </div>`;
+                
+            const oldModal = document.getElementById('url-modal'); 
+            if (oldModal) oldModal.remove();
+            
             document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-        } catch (error) {
+            
+        } catch (error) { 
+            alert("Error de red intentando conectar con Firebase."); 
             console.error(error);
-            alert("Error en la sincronización con Firebase: " + error.message);
-        } finally {
-            document.body.style.cursor = 'default';
+        } finally { 
+            document.body.style.cursor = 'default'; 
         }
     }
 
-    window.copyUrl = function() {
-        const input = document.getElementById('url-input');
-        input.select(); input.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(input.value).then(() => alert('Código copiado al portapapeles.'));
+    // Funciones del Portapapeles
+    window.copyUrl = function() { 
+        const input = document.getElementById('url-input'); 
+        input.select(); 
+        navigator.clipboard.writeText(input.value); 
+        alert("Enlace copiado al portapapeles.");
     };
 
+    // Funciones para Guardar Notas y Resultados
     function guardarLocalmente(registro) {
         let registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        registros.push(registro);
+        registros.push(registro); 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
     }
-    async function enviarResultadosTelegram(nombre, cedula, puntos, total) {
+
+    async function enviarResultadosTelegram(nombre, cedula, puntos, total, justificaciones) {
         const { token, chatid } = obtenerConfigTelegram();
         if (!token || !chatid) return false;
-        const msg = `⚡ *NUEVA CONEXIÓN*%0A👾 Usuario: ${escapeMarkdownV1(nombre)}%0A🆔 ID: ${escapeMarkdownV1(cedula)}%0A📊 Resultado: ${puntos}/${total}`;
-        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatid}&text=${msg}&parse_mode=Markdown`;
-        try { await fetch(url); return true; } catch (e) { return false; }
-    }
-    async function guardarPuntaje(nombre, cedula, puntos, total) {
-        guardarLocalmente({ nombre, cedula, nota: puntos, total_preguntas: total, fecha: new Date().toISOString() });
-        await enviarResultadosTelegram(nombre, cedula, puntos, total);
-    }
-    function obtenerRegistrosLocales() { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-    function borrarTodosLosRegistros() {
-        if (!confirm('¿Purgar toda la base de datos local?')) return;
-        localStorage.removeItem(STORAGE_KEY); abrirPanelNotas();
-    }
-    function borrarRegistroPorCedula(cedula) {
-        let registros = obtenerRegistrosLocales().filter(r => r.cedula !== cedula);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(registros)); abrirPanelNotas();
-    }
-    function abrirPanelNotas() {
-        document.getElementById('editor-view').classList.add('hidden');
-        document.getElementById('dashboard-view').classList.remove('hidden');
-        const registros = obtenerRegistrosLocales();
-        const tbody = document.getElementById('notas-body');
-        if (registros.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Sin datos en el sector.</td></tr>';
-            return;
+        
+        // Identificamos visualmente en el bot si el alumno escribió algo
+        const tieneJust = justificaciones && justificaciones.length > 0;
+        const msg = `⚡ *NUEVA CONEXIÓN*%0A👾 Usuario: ${escapeMarkdownV1(nombre)}%0A🆔 ID: ${escapeMarkdownV1(cedula)}%0A📊 Resultado: ${puntos}/${total}%0A✍️ Escribió Justificaciones: ${tieneJust ? 'Sí (Revisar Panel)' : 'No'}`;
+        
+        try { 
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatid}&text=${msg}&parse_mode=Markdown`); 
+            return true; 
+        } catch (e) { 
+            return false; 
         }
-        registros.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-        tbody.innerHTML = registros.map(fila => `
-            <tr><td>${escapeHTML(fila.nombre)}</td><td>${escapeHTML(fila.cedula)}</td>
-            <td><strong style="color:var(--neon-lime); text-shadow: 0 0 5px var(--neon-lime-glow);">${fila.nota}/${fila.total_preguntas}</strong></td>
-            <td><button style="background:none; border:none; color:var(--neon-pink); font-size:12px; cursor:pointer; font-weight:bold; text-transform:uppercase;" onclick="borrarRegistroPorCedula('${escapeHTML(fila.cedula)}')">[ DEL ]</button></td></tr>
-        `).join('');
-    }
-    function cerrarPanelNotas() {
-        document.getElementById('dashboard-view').classList.add('hidden');
-        document.getElementById('editor-view').classList.remove('hidden');
     }
 
-    // INICIALIZACIÓN: CONEXIÓN AUTOMÁTICA DE ALUMNOS CON PERFIL GUARDADO
+    async function guardarPuntaje(nombre, cedula, puntos, total) {
+        guardarLocalmente({ 
+            nombre, 
+            cedula, 
+            nota: puntos, 
+            total_preguntas: total, 
+            fecha: new Date().toISOString(), 
+            justificaciones: studentJustifications 
+        });
+        
+        await enviarResultadosTelegram(nombre, cedula, puntos, total, studentJustifications);
+    }
+
+    // Funciones de Visualización y Gestión del Panel de Notas
+    function obtenerRegistrosLocales() { 
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; 
+    }
+
+    function borrarTodosLosRegistros() { 
+        if (confirm('¿Estás seguro de querer purgar toda la base de datos local?')) { 
+            localStorage.removeItem(STORAGE_KEY); 
+            abrirPanelNotas(); 
+        } 
+    }
+
+    function borrarRegistroPorCedula(cedula) {
+        let registros = obtenerRegistrosLocales().filter(r => r.cedula !== cedula);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(registros)); 
+        abrirPanelNotas();
+    }
+
+    function abrirPanelNotas() {
+        document.getElementById('editor-view').classList.add('hidden'); 
+        document.getElementById('dashboard-view').classList.remove('hidden');
+        
+        const registros = obtenerRegistrosLocales();
+        const tbody = document.getElementById('notas-body');
+        
+        if (registros.length === 0) { 
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Sin datos en este sector.</td></tr>'; 
+            return; 
+        }
+        
+        // Ordenar del más reciente al más antiguo
+        registros.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+        
+        tbody.innerHTML = registros.map(fila => {
+            const tieneJust = fila.justificaciones && fila.justificaciones.length > 0;
+            const botonJust = tieneJust 
+                ? `<button class="btn-outline" style="padding: 6px 12px; font-size: 12px; border-color: var(--neon-cyan); margin: 0;" onclick="verJustificaciones('${escapeHTML(fila.cedula)}')">[ LEER ]</button>` 
+                : '<span style="color:var(--text-muted); font-size: 12px;">N/A</span>';
+            
+            return `<tr>
+                <td>
+                    ${escapeHTML(fila.nombre)} <br>
+                    <span style="font-size:12px; color:var(--text-muted);">${escapeHTML(fila.cedula)}</span>
+                </td>
+                <td><strong style="color:var(--neon-lime); text-shadow: 0 0 5px var(--neon-lime-glow);">${fila.nota}/${fila.total_preguntas}</strong></td>
+                <td>${botonJust}</td>
+                <td>
+                    <button style="background:none; border:none; color:var(--neon-pink); cursor:pointer; font-weight:bold;" onclick="borrarRegistroPorCedula('${escapeHTML(fila.cedula)}')">X</button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    window.verJustificaciones = function(cedula) {
+        const registros = obtenerRegistrosLocales();
+        const registro = registros.find(r => r.cedula === cedula);
+        
+        if (!registro || !registro.justificaciones) return;
+        
+        const html = registro.justificaciones.map((j, i) => `
+            <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-bottom: 16px; border-left: 4px solid var(--neon-pink);">
+                <strong style="color: var(--neon-cyan); display: block; margin-bottom: 8px;">P${i+1}: ${escapeHTML(j.pregunta)}</strong>
+                <div style="color: var(--text-light); font-style: italic; border-top: 1px dashed #334155; padding-top: 8px;">"${escapeHTML(j.justificacion)}"</div>
+            </div>
+        `).join('');
+        
+        document.getElementById('justifications-content').innerHTML = html;
+        document.getElementById('justifications-modal').classList.remove('hidden');
+    }
+
+    function cerrarPanelNotas() { 
+        document.getElementById('dashboard-view').classList.add('hidden'); 
+        document.getElementById('editor-view').classList.remove('hidden'); 
+    }
+
+    // Funciones Principales del Alumno (Cuenta Regresiva y Flujo)
+    function iniciarQuizConCuentaRegresiva() {
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('teacher-auth-view').classList.add('hidden');
+        
+        // Vaciamos por seguridad las justificaciones antes de empezar
+        studentJustifications = []; 
+        
+        const overlay = document.getElementById('countdown-overlay');
+        const numberEl = document.getElementById('countdown-number');
+        overlay.classList.remove('hidden');
+        
+        let count = 5;
+        numberEl.innerText = count;
+        
+        const interval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                numberEl.innerText = count;
+                // Efecto de latido en los números
+                numberEl.style.transform = 'scale(1.2)';
+                setTimeout(() => numberEl.style.transform = 'scale(1)', 150);
+            } else {
+                clearInterval(interval);
+                overlay.classList.add('hidden');
+                document.getElementById('quiz-view').classList.remove('hidden');
+                renderQuestion();
+            }
+        }, 1000);
+    }
+
     async function init() {
         const params = new URLSearchParams(window.location.search);
         
         if (params.has('id')) {
-            const binId = params.get('id');
             document.getElementById('teacher-auth-view').classList.add('hidden');
-            
-            document.body.insertAdjacentHTML('afterbegin', `<div id="loading-overlay" style="position:fixed; inset:0; background:var(--bg-deep); z-index:10000; display:flex; align-items:center; justify-content:center; color:var(--neon-cyan); font-weight:900; letter-spacing:2px;">ESTABLECIENDO ENLACE NEURAL...</div>`);
+            document.body.insertAdjacentHTML('afterbegin', `<div id="loading-overlay" style="position:fixed; inset:0; background:var(--bg-deep); z-index:10000; display:flex; align-items:center; justify-content:center; color:var(--neon-cyan); font-weight:900; letter-spacing: 2px;">DESCARGANDO DE LA NUBE...</div>`);
             
             try {
-                const response = await fetch(`${FIREBASE_DB_URL}/${binId}.json`);
+                // Descargamos el quiz de la base de datos de Firebase
+                const response = await fetch(`${FIREBASE_DB_URL}/${params.get('id')}.json`);
                 const decoded = await response.json();
                 
-                if (!decoded) throw new Error("ID inválido o inexistente en los servidores.");
-                
-                quizData = decoded.questions;
-                window.quizTime = parseInt(decoded.time) || 20;
+                quizData = decoded.questions; 
+                window.quizTime = parseInt(decoded.time) || 30;
                 
                 document.getElementById('loading-overlay').remove();
                 
-                // COMPROBAMOS SI YA INICIÓ SESIÓN ANTES
+                // Comprobamos si el alumno tiene guardada una sesión persistente
                 const perfilGuardado = localStorage.getItem(PROFILE_STORAGE_KEY);
+                
                 if (perfilGuardado) {
-                    const perfil = JSON.parse(perfilGuardado);
-                    studentProfile = perfil;
-                    
-                    // Inyectamos el texto de cabecera e ingresamos directo al examen
+                    studentProfile = JSON.parse(perfilGuardado);
                     document.getElementById('user-display').innerText = `${studentProfile.name.toUpperCase()} (${studentProfile.id})`;
-                    document.getElementById('quiz-view').classList.remove('hidden');
-                    renderQuestion();
+                    iniciarQuizConCuentaRegresiva();
                 } else {
-                    // Si es nuevo, pedimos autenticación tradicional
                     document.getElementById('login-view').classList.remove('hidden');
                 }
-                setMascotState('neutral');
-                
-            } catch (e) {
-                alert("Error de Red: " + e.message);
-                location.href = location.pathname;
+            } catch (e) { 
+                alert("Error de Red al conectar con Firebase."); 
+                location.href = location.pathname; 
             }
-        } else if (params.has('quiz')) {
-            try {
-                const decoded = JSON.parse(LZString.decompressFromEncodedURIComponent(params.get('quiz')));
-                quizData = decoded.questions;
-                window.quizTime = parseInt(decoded.time) || 20;
-                document.getElementById('teacher-auth-view').classList.add('hidden');
-                document.getElementById('login-view').classList.remove('hidden');
-            } catch(e) { location.href = location.pathname; }
         } else {
+            // Si entra limpio a la página sin ID, le muestra el login de Admin
             document.getElementById('teacher-auth-view').classList.remove('hidden');
             document.getElementById('mascot-container').style.display = 'none';
         }
@@ -741,110 +1170,164 @@
     function iniciarProtocoloAlumno() {
         const nombre = document.getElementById('student-name').value.trim();
         const cedula = document.getElementById('student-id').value.trim();
-        if (!nombre || !cedula) { alert("Identidad incompleta."); return; }
+        
+        if (!nombre || !cedula) { 
+            alert("Identidad incompleta. Por favor llena ambos campos."); 
+            return; 
+        }
         
         studentProfile = { name: nombre, id: cedula };
         
-        // GUARDAMOS EN MEMORIA DEL TELÉFONO O COMPUTADORA
+        // Se guarda en el navegador local para no pedir login después
         localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(studentProfile));
         
         document.getElementById('user-display').innerText = `${studentProfile.name.toUpperCase()} (${studentProfile.id})`;
-        document.getElementById('login-view').classList.add('hidden');
-        document.getElementById('quiz-view').classList.remove('hidden');
-        renderQuestion();
+        iniciarQuizConCuentaRegresiva();
     }
 
-    // FUNCIÓN PARA ELIMINAR LA SESIÓN GUARDADA
-    function cerrarSesionAlumno() {
-        if(confirm("¿Quieres cerrar sesión y cambiar de usuario?")) {
-            localStorage.removeItem(PROFILE_STORAGE_KEY);
-            location.reload(); // Recarga la interfaz al login original
-        }
+    function cerrarSesionAlumno() { 
+        if(confirm("¿Estás seguro de que deseas cerrar sesión y cambiar de usuario?")) { 
+            localStorage.removeItem(PROFILE_STORAGE_KEY); 
+            location.reload(); 
+        } 
     }
 
+    // Funciones del Motor de Juego (Render y Lógica)
     function renderQuestion() {
         const q = quizData[currentIndex];
         const correctOption = q.options.find(o => o.correct);
+        
         lastCorrectText = correctOption ? capitalizarFrase(correctOption.text) : "";
         currentExplanation = q.explanation || '';
         
-        document.getElementById('game-content').innerHTML = `
+        let html = `
             <img class="quiz-img ${q.img ? '' : 'hidden'}" src="${q.img}">
-            <h2 style="font-size: 24px; margin-bottom: 28px; font-weight: 800; line-height: 1.4; letter-spacing: 0.5px;">${capitalizarFrase(q.q)}</h2>
+            <h2 style="font-size: 24px; margin-bottom: 28px; font-weight: 800; line-height: 1.4;">${capitalizarFrase(q.q)}</h2>
             <div class="options-grid"></div>
         `;
         
+        // SI LA PREGUNTA REQUIERE JUSTIFICACIÓN, INYECTAMOS EL TEXTAREA
+        if (q.requireJustification) {
+            html += `
+                <div style="margin-top: 24px; animation: fadeIn 0.5s ease;">
+                    <label style="color: var(--neon-pink); font-size: 15px;">⚠️ Justifica tu respuesta:</label>
+                    <textarea id="student-justification" placeholder="Escribe aquí por qué elegiste esa opción... (Requerido para avanzar)" style="min-height: 120px; border-color: var(--neon-pink);"></textarea>
+                </div>
+            `;
+        }
+
+        document.getElementById('game-content').innerHTML = html;
         const grid = document.querySelector('#game-content .options-grid');
         
+        // Aleatorización (Fisher-Yates) de las opciones
         let shuffled = [...q.options];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        for (let i = shuffled.length - 1; i > 0; i--) { 
+            const j = Math.floor(Math.random() * (i + 1)); 
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; 
         }
         
-        selectedIdx = null; window.selectedCorrect = false;
+        selectedIdx = null; 
+        window.selectedCorrect = false;
+        
         shuffled.forEach((opt, idx) => {
-            const btn = document.createElement('div');
-            btn.className = 'opt-btn';
-            btn.innerText = capitalizarFrase(opt.text);
+            const btn = document.createElement('div'); 
+            btn.className = 'opt-btn'; 
+            btn.innerText = capitalizarFrase(opt.text); 
             btn.dataset.isCorrect = opt.correct;
-
-            btn.onclick = () => {
-                grid.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                selectedIdx = idx;
-                window.selectedCorrect = opt.correct;
+            
+            btn.onclick = () => { 
+                grid.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); 
+                btn.classList.add('selected'); 
+                selectedIdx = idx; 
+                window.selectedCorrect = opt.correct; 
             };
+            
             grid.appendChild(btn);
         });
         
-        startTimer();
+        startTimer(); 
         setMascotState('neutral');
     }
 
     function startTimer() {
-        clearInterval(timerInterval);
+        clearInterval(timerInterval); 
         timeLeft = window.quizTime;
+        
         const bar = document.getElementById('timer-fill');
-        bar.style.transition = 'none'; bar.style.width = '100%'; 
-        bar.style.background = 'var(--neon-cyan)';
+        bar.style.transition = 'none'; 
+        bar.style.width = '100%'; 
+        bar.style.background = 'var(--neon-cyan)'; 
         bar.style.boxShadow = '0 0 10px var(--neon-cyan-glow)';
         
-        setTimeout(() => { bar.style.transition = `width ${timeLeft}s linear`; bar.style.width = '0%'; }, 50);
+        setTimeout(() => { 
+            bar.style.transition = `width ${timeLeft}s linear`; 
+            bar.style.width = '0%'; 
+        }, 50);
+        
         timerInterval = setInterval(() => {
             timeLeft--;
-            if (timeLeft <= 5) {
-                bar.style.background = 'var(--neon-pink)';
-                bar.style.boxShadow = '0 0 15px var(--neon-pink-glow)';
+            if (timeLeft <= 5) { 
+                bar.style.background = 'var(--neon-pink)'; 
+                bar.style.boxShadow = '0 0 15px var(--neon-pink-glow)'; 
             }
-            if (timeLeft <= 0) { clearInterval(timerInterval); handleTimeOut(); }
+            if (timeLeft <= 0) { 
+                clearInterval(timerInterval); 
+                handleTimeOut(); 
+            }
         }, 1000);
     }
 
     function validateSelection() {
         if (selectedIdx === null) return;
+        
+        const q = quizData[currentIndex];
+        
+        // VALIDACIÓN ESTRICTA: SI HAY JUSTIFICACIÓN REQUERIDA
+        if (q.requireJustification) {
+            const textareaElem = document.getElementById('student-justification');
+            if (textareaElem) {
+                const justText = textareaElem.value.trim();
+                if (!justText) {
+                    alert("⚠️ ALERTA: Esta pregunta requiere que escribas una justificación válida para poder avanzar.");
+                    textareaElem.focus();
+                    return; // Retorna y bloquea el avance
+                }
+                // Si escribió, se guarda en la memoria
+                studentJustifications.push({ 
+                    pregunta: q.q, 
+                    justificacion: justText 
+                });
+            }
+        }
+
         clearInterval(timerInterval);
-        if (window.selectedCorrect) studentScore++;
+        
+        if (window.selectedCorrect) {
+            studentScore++;
+        }
+        
         showFeedback(window.selectedCorrect);
     }
 
-    function handleTimeOut() { showFeedback(false, "SISTEMA: TIEMPO AGOTADO"); }
+    function handleTimeOut() { 
+        showFeedback(false, "TIEMPO AGOTADO"); 
+    }
 
     function showFeedback(isCorrect, customTitle) {
         if (autoNextTimer) clearTimeout(autoNextTimer);
         
         const options = document.querySelectorAll('.opt-btn');
-        options.forEach(btn => {
-            btn.style.pointerEvents = 'none';
+        options.forEach(btn => { 
+            btn.style.pointerEvents = 'none'; 
             if (btn.dataset.isCorrect === "true") {
-                btn.classList.add('correct');
+                btn.classList.add('correct'); 
             } else if (btn.classList.contains('selected')) {
-                btn.classList.add('wrong');
+                btn.classList.add('wrong'); 
             }
         });
 
         const bar = document.getElementById('feedback-bar');
-        bar.className = 'feedback-bar show';
+        bar.className = 'feedback-bar show'; 
         bar.classList.add(isCorrect ? 'correct-bg' : 'wrong-bg');
         
         document.getElementById('fb-title').innerText = customTitle || (isCorrect ? '¡PROCESO CORRECTO!' : 'ERROR EN SISTEMA');
@@ -854,41 +1337,60 @@
         document.getElementById('fb-sub').innerText = isCorrect ? 'Datos procesados con éxito.' : `Nodo correcto: ${lastCorrectText}`;
         
         const explDiv = document.getElementById('fb-explanation');
-        if (currentExplanation.trim()) {
-            explDiv.classList.remove('hidden'); explDiv.innerText = currentExplanation;
+        if (currentExplanation.trim()) { 
+            explDiv.classList.remove('hidden'); 
+            explDiv.innerText = currentExplanation; 
         } else {
             explDiv.classList.add('hidden');
         }
         
-        const btn = document.getElementById('fb-btn');
-        btn.className = isCorrect ? 'btn-success' : 'btn-danger';
+        const btn = document.getElementById('fb-btn'); 
+        btn.className = isCorrect ? 'btn-success' : 'btn-danger'; 
         btn.innerText = 'CONTINUAR >>';
         
         setMascotState(isCorrect ? 'happy' : 'sad');
-        if (!isCorrect) autoNextTimer = setTimeout(() => nextQuestion(), 5000);
-        else if (typeof confetti !== 'undefined') confetti({ 
-            particleCount: 120, 
-            spread: 70, 
-            origin: { y: 0.8 }, 
-            colors: ['#00f0ff', '#ff2a85', '#ccff00'] 
-        });
+        
+        if (!isCorrect) {
+            autoNextTimer = setTimeout(() => nextQuestion(), 5000); 
+        } else if (typeof confetti !== 'undefined') {
+            confetti({ 
+                particleCount: 120, 
+                spread: 70, 
+                origin: { y: 0.8 }, 
+                colors: ['#00f0ff', '#ff2a85', '#ccff00'] 
+            }); 
+        }
     }
 
     function nextQuestion() {
-        if (autoNextTimer) { clearTimeout(autoNextTimer); autoNextTimer = null; }
-        const bar = document.getElementById('feedback-bar');
-        bar.className = 'feedback-bar';
+        if (autoNextTimer) { 
+            clearTimeout(autoNextTimer); 
+            autoNextTimer = null; 
+        }
+        
+        document.getElementById('feedback-bar').className = 'feedback-bar';
         currentIndex++;
-        if (currentIndex < quizData.length) renderQuestion();
-        else finalizarYCargarNotas();
+        
+        if (currentIndex < quizData.length) {
+            renderQuestion(); 
+        } else {
+            finalizarYCargarNotas();
+        }
     }
 
     async function finalizarYCargarNotas() {
-        document.getElementById('feedback-bar').className = 'feedback-bar';
+        document.getElementById('feedback-bar').className = 'feedback-bar'; 
         quizCompletado = true;
+        
         const total = quizData.length;
-        document.getElementById('game-content').innerHTML = '<div style="text-align:center; padding: 60px 0;"><h2 style="color:var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan-glow); animation: pulse 1.5s infinite;">Sincronizando datos...</h2></div>';
-        document.getElementById('main-check-btn').classList.add('hidden');
+        
+        document.getElementById('game-content').innerHTML = `
+            <div style="text-align:center; padding: 60px 0;">
+                <h2 style="color:var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan-glow); animation: pulse 1.5s infinite;">Sincronizando datos...</h2>
+            </div>
+        `;
+        
+        document.getElementById('main-check-btn').classList.add('hidden'); 
         document.querySelector('.progress-container').classList.add('hidden');
         
         await guardarPuntaje(studentProfile.name, studentProfile.id, studentScore, total);
@@ -896,17 +1398,23 @@
         document.getElementById('game-content').innerHTML = `
             <div style="animation: fadeIn 0.8s ease; text-align: center; margin-top: 20px;">
                 <h1 style="color: var(--neon-lime); font-size: 34px; margin-bottom: 24px; text-shadow: 0 0 15px var(--neon-lime-glow); text-transform: uppercase;">Simulación Terminada</h1>
+                
                 <div class="q-card" style="display: inline-block; text-align: left; min-width: 280px; border-color: var(--neon-lime); box-shadow: 0 0 20px rgba(204, 255, 0, 0.2);">
                     <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Usuario</p>
                     <p style="font-size: 20px; font-weight: 800; margin-bottom: 24px; color: var(--text-light);">${escapeHTML(studentProfile.name)}</p>
+                    
                     <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Rendimiento</p>
                     <p style="font-size: 42px; font-weight: 900; color: var(--neon-lime); margin: 0; text-shadow: 0 0 10px var(--neon-lime-glow);">${studentScore} <span style="font-size:24px; color: var(--text-muted); text-shadow:none;">/ ${total}</span></p>
                 </div>
+                
                 <p style="color: var(--text-muted); font-size: 15px; margin-top: 32px; font-weight: 600;">Desconexión segura disponible.</p>
-            </div>`;
+            </div>
+        `;
+        
         setMascotState('happy');
     }
 
+    // Arranque del sistema
     window.onload = init;
 </script>
 </body>
